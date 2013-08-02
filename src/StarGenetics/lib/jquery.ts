@@ -1,4 +1,4 @@
-/// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
+/// <reference path="../../../../starx/src/StarX/lib/jquery.d.ts" />
 
 declare var $:JQueryStatic;
 declare var $:JQueryStatic;
