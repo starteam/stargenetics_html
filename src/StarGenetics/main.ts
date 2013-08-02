@@ -32,13 +32,18 @@ export class StarGenetics {
         var callbacks = {
             onclose: function (socket, event) {
                 self.set_message("<b>StarGenetics not connected!</b><br>" + new Date());
-                setTimeout(function() {
+                setTimeout(function () {
                     self.establish_connection(callbacks)
-                },500);
+                }, 500);
             },
-            onopen: function( socket, event ) {
+            onopen: function (socket, event) {
                 self.set_message("Connection established!");
-                socket.send( "Hello StarGenetics, how are you today?");
+                socket.send("Hello StarGenetics, how are you today?");
+            },
+            onmessage: function (socket, messageevent) {
+                self.set_message(messageevent.data);
+                socket.send("You said:" + messageevent.data);
+
             }
 
         };
@@ -52,7 +57,7 @@ export class StarGenetics {
             console.info("onopen");
             console.info(a);
             console.info(socket);
-            callbacks.onopen( socket );
+            callbacks.onopen(socket);
         }
         socket.onclose = function (closeevent) {
             console.info("onclose");
@@ -65,10 +70,9 @@ export class StarGenetics {
             console.info(a);
             //callbacks.onerror(socket);
         }
-        socket.onmessage = function (a) {
+        socket.onmessage = function (messageevent) {
             console.info("onmessage");
-            console.info(a);
-            //callbacks.onmessage(socket);
+            callbacks.onmessage(socket, messageevent);
         }
 
     }

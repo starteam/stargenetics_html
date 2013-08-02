@@ -29,6 +29,10 @@ define(["require", "exports"], function(require, exports) {
                 onopen: function (socket, event) {
                     self.set_message("Connection established!");
                     socket.send("Hello StarGenetics, how are you today?");
+                },
+                onmessage: function (socket, messageevent) {
+                    self.set_message(messageevent.data);
+                    socket.send("You said:" + messageevent.data);
                 }
             };
             this.establish_connection(callbacks);
@@ -53,9 +57,9 @@ define(["require", "exports"], function(require, exports) {
                 console.info("onerror");
                 console.info(a);
             };
-            socket.onmessage = function (a) {
+            socket.onmessage = function (messageevent) {
                 console.info("onmessage");
-                console.info(a);
+                callbacks.onmessage(socket, messageevent);
             };
         };
         return StarGenetics;
