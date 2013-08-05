@@ -1,0 +1,30 @@
+{namespace stargeneticsws}
+
+/**
+ * Says hello to the world.
+*/
+{template .before_open}
+        <h1>Hello world!</h1>
+        {call .footer}
+        {/call}
+{/template}
+
+/**
+*
+*/
+{template .onopen}
+    <h1>Connection Established!<h1>
+    <button class='open_experiment'>Open</button>
+    <button class='save_experiment'>Save</button>
+    <textarea class='save_experiment_output'></textarea>
+
+{/template}
+
+/**
+ * Says hello to the world.
+*/
+{template .footer}
+        <b>Produced by STAR team. </b>
+{/template}
+
+
