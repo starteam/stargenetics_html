@@ -13,6 +13,8 @@ import jQlib = module("lib/jquery");
 
 var $:JQueryStatic = jQuery;
 
+var StarGeneticsGlobalState = {};
+
 export class StarGenetics {
     config:StarGeneticsConfig;
 
@@ -22,6 +24,29 @@ export class StarGenetics {
     }
 
     configure(config:StarGeneticsConfig) {
+        var self = this;
+        this.config = config;
+        if( config.Widget == 'StudentID')
+        {
+            StarGeneticsGlobalState.StudentID = { 'element_id': config.element_id , student_id: config.StudentID};
+
+
+        }
+        else if( config.Widget == 'SelectExperiment' )
+        {
+            console.info( "This builds select experiment ui");
+
+        }
+        else {
+            StarGeneticsGlobalState.App = { 'element_id': config.element_id };
+
+            console.info( "This starts main");
+        }
+        console.info( "Welcome to SG");
+        console.info( StarGeneticsGlobalState );
+    }
+
+    configure2(config:StarGeneticsConfig) {
         var self = this;
         this.config = config;
 //        console.info( Config.config ) ;

@@ -26,7 +26,7 @@ stargeneticsws.before_open = function(opt_data, opt_sb) {
  */
 stargeneticsws.onopen = function(opt_data, opt_sb) {
   var output = opt_sb || new soy.StringBuilder();
-  output.append('<h1>Connection Established!<h1><button class=\'open_experiment\'>Open</button><button class=\'save_experiment\'>Save</button><textarea class=\'save_experiment_output\'></textarea>');
+  output.append('<h1>Connection Established!</h1><button class=\'open_experiment\'>Open</button><button class=\'save_experiment\'>Save</button><textarea class=\'save_experiment_output\'></textarea><br>Text area length:<div class=\'save_experiment_length\'><div>');
   return opt_sb ? '' : output.toString();
 };
 

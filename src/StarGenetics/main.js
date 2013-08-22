@@ -6,6 +6,8 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(requi
 
     var $ = jQuery;
 
+    var StarGeneticsGlobalState = {};
+
     var StarGenetics = (function () {
         function StarGenetics() {
         }
@@ -14,6 +16,22 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(requi
         };
 
         StarGenetics.prototype.configure = function (config) {
+            var self = this;
+            this.config = config;
+            if (config.Widget == 'StudentID') {
+                StarGeneticsGlobalState.StudentID = { 'element_id': config.element_id, student_id: config.StudentID };
+            } else if (config.Widget == 'SelectExperiment') {
+                console.info("This builds select experiment ui");
+            } else {
+                StarGeneticsGlobalState.App = { 'element_id': config.element_id };
+
+                console.info("This starts main");
+            }
+            console.info("Welcome to SG");
+            console.info(StarGeneticsGlobalState);
+        };
+
+        StarGenetics.prototype.configure2 = function (config) {
             var self = this;
             this.config = config;
 
