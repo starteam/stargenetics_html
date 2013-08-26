@@ -7,4 +7,4 @@ export class ConfigElement {
 export var config = [
     new ConfigElement('show'),
     new ConfigElement('hide')
-];
+]; 

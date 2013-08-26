@@ -1,7 +1,5 @@
-define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(require, exports) {
+define(["require", "exports", "StarGenetics/stargeneticsws.soy", "StarGenetics/state", "StarGenetics/appwidget"], function(require, exports) {
     var SGUI = require("StarGenetics/stargeneticsws.soy");
-    console.info("SGUI ");
-    console.info(SGUI);
 
     
 
@@ -9,22 +7,14 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(requi
 
     var $ = jQuery;
 
-    var StarGeneticsGlobalState = {};
+    var GlobalState = require("StarGenetics/state");
+    var StarGeneticsGlobalState = new GlobalState.StarGeneticsGlobalState();
 
     var StarGenetics = (function () {
         function StarGenetics() {
         }
         StarGenetics.prototype.set_message = function (message) {
             $('#' + this.config.element_id).html(message);
-        };
-
-        StarGenetics.prototype.get_state = function (config) {
-            var Group = config['Group'] || 'default';
-            if (!StarGeneticsGlobalState[Group]) {
-                StarGeneticsGlobalState[Group] = {};
-            }
-            var state = StarGeneticsGlobalState[Group];
-            return state;
         };
 
         StarGenetics.prototype.get_input_element = function (config) {
@@ -44,14 +34,16 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(requi
         StarGenetics.prototype.configure = function (config) {
             var self = this;
             this.config = config;
-            var state = this.get_state(config);
-
+            var state = StarGeneticsGlobalState.get_state(config);
             if (config.Widget == 'StudentID') {
-                state.StudentID = { 'element_id': config.element_id, student_id: config.StudentID };
-                $('#' + config.element_id).html("StarGenetics: StudentID");
+                var StudentID = state.setStudentID(config);
+                state.StudentID = { 'element_id': StudentID.uid, student_id: StudentID.id };
+                $('#' + StudentID.uid).html("StudentID set.");
             } else if (config.Widget == 'App') {
+                var AppState = state.setApp(config);
                 state.App = { config: config, input_element: this.get_input_element(config) };
-                this.configure2(config, state);
+                var AppWidget = require("StarGenetics/appwidget");
+                var AppWidget = new AppWidget.StarGeneticsAppWidget(state);
             } else if (config.Widget == 'SelectExperiment') {
                 console.info("This builds select experiment ui");
                 $('#' + config.element_id).html("StarGenetics: SelectExperiment");
@@ -107,11 +99,23 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(requi
         StarGenetics.prototype.establish_connection = function (callbacks) {
             var port = 25261;
             var socket = new WebSocket("ws://localhost:" + port + "/", "stargenetics");
+
+            function ping(socket) {
+                if (socket.readyState == WebSocket.OPEN) {
+                    console.info("ping");
+                    socket.send('{"command":"ping"}');
+                    setTimeout(function () {
+                        ping(socket);
+                    }, 30000);
+                }
+            }
+
             socket.onopen = function (a) {
                 console.info("onopen");
                 console.info(a);
                 console.info(socket);
                 callbacks.onopen(socket, a);
+                ping(socket);
             };
             socket.onclose = function (closeevent) {
                 callbacks.onclose(socket, closeevent);
