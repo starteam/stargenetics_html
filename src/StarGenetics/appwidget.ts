@@ -4,11 +4,12 @@
 /// <reference path="StarGenetics/state.ts" />
 /// <reference path="StarGenetics/config.d.ts" />
 
-var SGUI   = require("StarGenetics/stargeneticsws.soy");
+var SGUI = require("StarGenetics/stargeneticsws.soy");
 
 
 export class StarGeneticsAppWidget {
     state:StarGeneticsState;
+    widget_state:StarGeneticsAppWidgetState;
 
     element() {
         return $('#' + this.state.StarGeneticsAppWidgetState.uid);
@@ -18,93 +19,141 @@ export class StarGeneticsAppWidget {
         $('#' + this.state.StarGeneticsAppWidgetState.uid).html(message);
     }
 
+    set_state(data:string) {
+        this.state.StarGeneticsAppWidgetState.input_element.attr('value', data);
+    }
+
+    get_state():string {
+        return this.state.StarGeneticsAppWidgetState.input_element.attr('value');
+    }
 
     constructor(state:StarGeneticsState, config:StarGeneticsConfig) {
         this.state = state;
+        this.widget_state = state.StarGeneticsAppWidgetState;
         this.$element = $('#' + this.state.StarGeneticsAppWidgetState.uid);
         this.set_message(SGUI.before_open());
         this.init();
     }
 
-    init()
-    {
+    init() {
         var self = this;
-        var callbacks = {
-            onclose: function (socket, event) {
-                self.set_message(
-                    "<b>StarGenetics not connected!</b><br>" + new Date());
-                setTimeout(function () {
-                    self.establish_connection(callbacks)
-                }, 500);
-            },
-            onopen: function (socket, event) {
-                self.set_message("Connection established!");
-                var $element = self.element();
-                $element.html(SGUI.onopen());
-                $('button.open_experiment',$element).click(function(){
-                    var msg ={"command":"open","url":"http://star.mit.edu/media/uploads/genetics/exercises_source_files/cow_exercise_1.xls","title":"Example Experiment"};
-                    socket.send(JSON.stringify(msg));
-                });
-                $('button.save_experiment',$element).click(function(){
-                    var msg ={"command":"save"};
-                    socket.send(JSON.stringify(msg));
-                });
-
-            },
-            onmessage: function (socket, messageevent) {
-                var message = JSON.parse(messageevent.data);
-                if( message['command'] == 'save_response') {
-                    var input_element = null; //this.state.StarGeneticsAppWidgetState.input_element;
-                    if( input_element )
-                    {
-                        $(input_element).attr('value', message['blob'])
-                    }
-                    $('.save_experiment_output').html(message['blob']);
-                }
-                //socket.send("You said:" + messageevent.data);
-
-            }
-
-        };
-        this.establish_connection(callbacks);
+        this.establish_connection();
     }
 
-    establish_connection(callbacks) {
+    ping(socket) {
+        var self = this;
+        if (socket.readyState == WebSocket.OPEN) {
+            console.info("ping");
+            socket.send('{"command":"ping"}');
+            setTimeout(function () {
+                self.ping(socket);
+            }, 30000);
+        }
+    }
+
+    onopen(socket, event) {
+        this.set_message("Connection established!");
+        var data = this.get_state();
+        var context = {
+            open: ('' + data).length > 16,
+            new: true,
+            save: false,
+            socket: socket
+        }
+        this.update_ui(context);
+
+    }
+
+    onmessage(socket, messageevent) {
+        var message = JSON.parse(messageevent.data);
+        console.info("onmessage");
+        console.info(message);
+        if (message['command'] == 'save_response') {
+            var data = message['stream'];
+            this.set_state(data);
+            $('.save_experiment_output').html(data);
+            var data = this.get_state();
+            var context = {
+                open: ('' + data).length > 16,
+                new: true,
+                save: true,
+                socket: socket
+            }
+            this.update_ui(context);
+        }
+    }
+
+    onclose(socket, event) {
+        var self = this;
+        this.set_message(
+            "<b>StarGenetics not connected!</b><br>" + new Date());
+        setTimeout(function () {
+            self.establish_connection();
+        }, 500);
+    }
+
+    onerror(socket, event) {
+
+    }
+
+    update_ui(context) {
+        var self = this;
+        var $element = this.element();
+        $element.html(SGUI.onopen(context));
+
+        $('button.sg_new_experiment', $element).click(function () {
+            self.new_ps(context.socket);
+        });
+        $('button.sg_open_experiment', $element).click(function () {
+            self.open_ps(context.socket);
+        });
+
+        $('button.sg_save_experiment', $element).click(function () {
+            self.save_ps(context.socket);
+        });
+    }
+
+    new_ps(socket) {
+        socket.send(JSON.stringify(this.widget_state.new));
+    }
+
+    save_ps(socket) {
+        socket.send(JSON.stringify(this.widget_state.save));
+    }
+
+    open_ps(socket) {
+        var open = this.widget_state.open;
+        open.stream = this.get_state();
+        $.ajax({
+            url: 'http://localhost:25261/',
+            type: 'post',
+            data: {data:JSON.stringify(open)}
+        });
+        //socket.send(JSON.stringify(open));
+    }
+
+    establish_connection() {
         var port = 25261;
         var socket = new WebSocket("ws://localhost:" + port + "/", "stargenetics");
+        var self = this;
 
-        console.info( "establish_connection");
-        function ping( socket )
-        {
-            if( socket.readyState == WebSocket.OPEN )
-            {
-                console.info( "ping");
-                socket.send( '{"command":"ping"}' );
-                setTimeout( function() { ping(socket);} , 30000 ) ;
-            }
-        }
+        console.info("establish_connection");
 
         socket.onopen = function (a) {
-            console.info("onopen");
-            console.info(a);
-            console.info(socket);
-            callbacks.onopen(socket, a);
-            ping(socket);
+            self.onopen(socket, a);
+            self.ping(socket);
+            self.state.onopen(socket,a);
+
         }
         socket.onclose = function (closeevent) {
-//            console.info("onclose");
-//            console.info(closeevent);
-//            console.info(socket);
-            callbacks.onclose(socket, closeevent);
+            self.onclose(socket, closeevent);
         }
         socket.onerror = function (a) {
-//            console.info("onerror");
-//            console.info(a);
-            //callbacks.onerror(socket);
+            self.onerror(socket, a);
         }
         socket.onmessage = function (messageevent) {
-            console.info("onmessage");
-            callbacks.onmessage(socket, messageevent);
+            self.onmessage(socket, messageevent);
+            self.state.onmessage(messageevent);
         }
 
     }

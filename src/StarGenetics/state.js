@@ -22,14 +22,74 @@ define(["require", "exports"], function(require, exports) {
         return StudentIDWidgetState;
     })();
     exports.StudentIDWidgetState = StudentIDWidgetState;
+    var StarGeneticsSelectExperimentWidgetState = (function () {
+        function StarGeneticsSelectExperimentWidgetState(config) {
+            this.config = config;
+        }
+        Object.defineProperty(StarGeneticsSelectExperimentWidgetState.prototype, "input_element", {
+            get: function () {
+                var ret;
+                var jq = $('[name=' + this.config.State + ']');
+                var ret = $('#' + jq.attr('inputid'));
+                return ret;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(StarGeneticsSelectExperimentWidgetState.prototype, "uid", {
+            get: function () {
+                return this.config.element_id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return StarGeneticsSelectExperimentWidgetState;
+    })();
+    exports.StarGeneticsSelectExperimentWidgetState = StarGeneticsSelectExperimentWidgetState;
 
     var StarGeneticsAppWidgetState = (function () {
         function StarGeneticsAppWidgetState(config) {
-            this.element_id = config.element_id;
+            this.config = config;
         }
+        Object.defineProperty(StarGeneticsAppWidgetState.prototype, "input_element", {
+            get: function () {
+                var ret;
+                var jq = $('[name=' + this.config.State + ']');
+                var ret = $('#' + jq.attr('inputid'));
+                return ret;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
         Object.defineProperty(StarGeneticsAppWidgetState.prototype, "uid", {
             get: function () {
-                return this.element_id;
+                return this.config['element_id'];
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(StarGeneticsAppWidgetState.prototype, "open", {
+            get: function () {
+                return this.config['open'];
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(StarGeneticsAppWidgetState.prototype, "new", {
+            get: function () {
+                return this.config['new'];
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(StarGeneticsAppWidgetState.prototype, "save", {
+            get: function () {
+                return this.config['save'];
             },
             enumerable: true,
             configurable: true
@@ -40,6 +100,7 @@ define(["require", "exports"], function(require, exports) {
 
     var StarGeneticsState = (function () {
         function StarGeneticsState() {
+            this.onmessages = {};
         }
         StarGeneticsState.prototype.setStudentID = function (config) {
             this.StudentIDWidgetState = new StudentIDWidgetState(config);
@@ -53,12 +114,31 @@ define(["require", "exports"], function(require, exports) {
 
         Object.defineProperty(StarGeneticsState.prototype, "student_id", {
             get: function () {
-                var sid = this.StudentIDWidget;
+                var sid = this.StudentIDWidgetState;
                 return sid ? sid.id : "__NOT_SET__";
             },
             enumerable: true,
             configurable: true
         });
+
+        StarGeneticsState.prototype.onmessage = function (message) {
+            var map = this.onmessages;
+            for (var k in map) {
+                var v = map[k];
+                v.onmessage(message);
+            }
+        };
+
+        StarGeneticsState.prototype.onopen = function (socket, event) {
+            var map = this.onmessages;
+            for (var k in map) {
+                var v = map[k];
+                v.onopen(socket, event);
+            }
+        };
+        StarGeneticsState.prototype.listen_websocket = function (config, listener) {
+            this.onmessages[config.element_id] = listener;
+        };
         return StarGeneticsState;
     })();
     exports.StarGeneticsState = StarGeneticsState;
