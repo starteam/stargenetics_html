@@ -1,0 +1,68 @@
+{namespace sg_client_mainframe}
+
+/**
+ * Says hello to the world.
+ @param config
+*/
+{template .main}
+    <div class='sg_main'>
+        <button class='sg_open_ps'>Open</button>
+    </div>
+    <div class='sg_main'>
+        <button class='sg_open_ps'>Close</button>
+    </div>
+    <div class='sg_workspace' id='{$config.element_id+'_workspace'}'>Workspace</div>
+
+{/template}
+
+/**
+*   Strains
+* @param strains
+*/
+{template .workspace}
+    <div class='sg_workspace_title'>StarGenetics Title</div>
+    {call .strains}
+        {param strains:$strains/}
+    {/call}
+    {call .experiment}
+    {/call}
+{/template}
+
+/**
+*   Strains
+* @param strains
+*/
+{template .strains}
+<div class='sg_strains_box'>
+    <div class='sg_strains_title'>
+        Strains
+    </div>
+    {foreach $strain in $strains}
+        <div class='sg_strain_box'>
+            <div class='sg_strain_title'>{$strain['name']}</div>
+            <div class='sg_strain_visual'>{$strain['visual']}</div>
+        </div>
+    {/foreach}
+</div>
+{/template}
+
+/**
+*   Active Experiment
+*/
+{template .experiment}
+<div class='sg_experiment_box'>
+    <div class='sg_experiment_heading'>
+        {call .experiment_heading}
+        {/call}
+    </div>
+    <div class='sg_experiment_parents'></div>
+    <div class='sg_experiment_summary'></div>
+</div>
+{/template}
+
+/**
+*
+*/
+{template .experiment_heading}
+    title
+{/template}

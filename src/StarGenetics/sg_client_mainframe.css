@@ -1,0 +1,60 @@
+.sg_workspace {
+    background: red;
+    top: 20px;
+    left:20px;
+    min-height: 800px;
+    min-width: 600px;
+    resize:both;
+    overflow:auto;
+}
+
+.sg_workspace_title {
+    display: block;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:50px;
+    background: #e0e0e0;
+    border: black 1px;
+    font-size:15pt;
+}
+
+.sg_strains_box {
+    display: block;
+    background: #e0e0e0;
+    border: 1px black solid;
+    height:100px;
+}
+
+.sg_strains_title {
+    display:inline-block;
+    width:100px;
+    height:100px;
+    background-color:darkgreen;
+    vertical-align:top;
+    color:white;
+    font-weight: 900;
+    font-size:15pt;
+}
+.sg_strain_box {
+    display:inline-block;
+    width:125px;
+    height:80px;
+    border:black solid 1px;
+    margin: 5px;
+}
+
+.sg_strain_title {
+    display: block;
+    vertical-align: top;
+    width:100%;
+    height:25px;
+}
+
+.sg_strain_visual {
+    display: block;
+    vertical-align: top;
+    width:100%;
+    height:55px;
+    background-color: blueviolet;
+}
