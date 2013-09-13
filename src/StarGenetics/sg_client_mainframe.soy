@@ -26,6 +26,8 @@
     {/call}
     {call .experiment}
     {/call}
+    {call .all_experiments}
+    {/call}
 {/template}
 
 /**
@@ -64,5 +66,37 @@
 *
 */
 {template .experiment_heading}
-    title
+
+    <div class='sg_experiment_title_group'>
+    <div class='sg_experiment_title'>
+        Title
+    </div>
+    <div class='sg_experiment_commands'>
+        <button>Mate</button>
+        <button>Save</button>
+        <button>Discard</button>
+    </div>
+    </div>
+    <div class='sg_experiment_parents'>
+        <div class='sg_experiment_parent'>
+            P1
+        </div>
+        <div class='sg_experiment_parent'>
+            P2
+        </div>
+    </div>
+{/template}
+
+/**
+*   Active Experiment
+*/
+{template .all_experiments}
+<div class='sg_experiments_history_box'>
+    <div class='sg_experiment_heading'>
+        {call .experiment_heading}
+        {/call}
+    </div>
+    <div class='sg_experiment_parents'></div>
+    <div class='sg_experiment_summary'></div>
+</div>
 {/template}

@@ -1,13 +1,13 @@
 /// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
 /// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="state.ts" />
+/// <reference path="config.d.ts" />
 /// <amd-dependency path="StarGenetics/stargeneticsws.soy" />
-/// <reference path="StarGenetics/state.ts" />
-/// <reference path="StarGenetics/config.d.ts" />
 
 var SGUI = require("StarGenetics/stargeneticsws.soy");
 
 
-export class StarGeneticsAppWidget {
+export class StarGeneticsJavaAppWidget {
     state:StarGeneticsState;
     widget_state:StarGeneticsAppWidgetState;
 
@@ -30,7 +30,7 @@ export class StarGeneticsAppWidget {
     constructor(state:StarGeneticsState, config:StarGeneticsConfig) {
         this.state = state;
         this.widget_state = state.StarGeneticsAppWidgetState;
-        this.$element = $('#' + this.state.StarGeneticsAppWidgetState.uid);
+//        this.$element = $('#' + this.state.StarGeneticsAppWidgetState.uid);
         this.set_message(SGUI.before_open());
         this.init();
     }
