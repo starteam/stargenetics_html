@@ -48,14 +48,14 @@ define(["require", "exports"], function(require, exports) {
                 },
                 {
                     "name": "white eyes",
-                    "matches": "aa",
+                    "matches": "a,a",
                     "phenotype": {
                         "eyes": "white"
                     }
                 },
                 {
                     "name": "wingless",
-                    "matches": "bb",
+                    "matches": "b,b",
                     "phenotype": {
                         "wings": 0
                     }

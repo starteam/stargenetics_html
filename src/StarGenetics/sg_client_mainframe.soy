@@ -17,17 +17,22 @@
 
 /**
 *   Strains
-* @param strains
+* @param model
 */
 {template .workspace}
-    <div class='sg_workspace_title'>StarGenetics Title</div>
-    {call .strains}
-        {param strains:$strains/}
-    {/call}
-    {call .experiment}
-    {/call}
-    {call .all_experiments}
-    {/call}
+    <div class='sg_workspace'>
+        <div class='sg_workspace_title'>StarGenetics Title</div>
+        {call .strains}
+            {param strains: $model.ui.strains /}
+        {/call}
+        {call .new_experiment}
+            {param experiment: $model.ui.new_experiment /}
+        {/call}
+        {call .experiment}
+        {/call}
+        {call .all_experiments}
+        {/call}
+    </div>
 {/template}
 
 /**
@@ -36,15 +41,105 @@
 */
 {template .strains}
 <div class='sg_strains_box'>
-    <div class='sg_strains_title'>
+    <div class='sg_title_box'>
         Strains
+        {if $strains.expanded}
+            <button class='sg_expand' data-kind='strains' data-expanded='false'>Collaps</button>
+            {if $strains.visualsVisible}
+            <button class='sg_strain_expand_visuals' data-kind='strains' data-expanded-visuals='false'>Hide Visuals</button>
+            {else}
+            <button class='sg_strain_expand_visuals' data-kind='strains' data-expanded-visuals='true'>Show Visuals</button>
+            {/if}
+            {if $strains.propertiesVisible}
+                <button class='sg_strain_expand_properties' data-kind='strains' data-expanded-properties='false'>Hide Properties</button>
+            {else}
+                <button class='sg_strain_expand_properties' data-kind='strains' data-expanded-properties='true'>Show Properties</button>
+            {/if}
+        {else}
+            <button class='sg_expand' data-kind='strains' data-expanded='true'>Expand</button>
+        {/if}
     </div>
-    {foreach $strain in $strains}
-        <div class='sg_strain_box'>
-            <div class='sg_strain_title'>{$strain['name']}</div>
-            <div class='sg_strain_visual'>{$strain['visual']}</div>
+    {if $strains.expanded}
+        {if $strains.propertiesVisible}
+            <table>
+                <thead>
+                    <td class='sg_s_col_head sg_s_row_head'>Name</td>
+                    {foreach $strain in $strains.list}
+                        <td class='sg_strain_box sg_s_row_head'>{$strain['name']}</td>
+                    {/foreach}
+                </thead>
+                {if $strains.visualsVisible}
+                <tr>
+                    <td class='sg_s_col_head'>Visual</td>
+                    {foreach $strain in $strains.list}
+                        <td class='sg_strain_box'>{$strain['visual']}</td>
+                    {/foreach}
+                </tr>
+                {/if}
+                {foreach $property in $strains.propertiesList}
+                <tr>
+                    <td class='sg_s_col_head'>{$property}</td>
+                    {foreach $strain in $strains.list}
+                        <td class='sg_strain_box'>{$strain.properties[$property]}</td>
+                    {/foreach}
+
+                </tr>
+                {/foreach}
+            </table>
+        {else}
+            {foreach $strain in $strains.list}
+                <div class='sg_strain_box sg_s_strain_box'>
+                    <div class='sg_strain_title'>{$strain['name']}</div>
+                    {if $strains.visualsVisible}
+                    <div class='sg_strain_visual'>{$strain['visual']}</div>
+                    {/if}
+                </div>
+            {/foreach}
+        {/if}
+    {else}
+    {/if}
+
+</div>
+{/template}
+
+/**
+*   Active Experiment
+* @param experiment
+*/
+{template .new_experiment}
+<div class='sg_new_experiment_box'>
+    <div class='sg_title_box'>
+        New Experiment
+        {if $experiment.expanded}
+            <button class='sg_expand' data-kind='new_experiment' data-expanded='false'>Collaps</button>
+            {if $experiment.visualsVisible}
+            <button class='sg_strain_expand_visuals' data-kind='new_experiment'  data-expanded-visuals='false'>Hide Visuals</button>
+            {else}
+            <button class='sg_strain_expand_visuals' data-kind='new_experiment' data-expanded-visuals='true'>Show Visuals</button>
+            {/if}
+            {if $experiment.propertiesVisible}
+                <button class='sg_strain_expand_properties' data-kind='new_experiment' data-expanded-properties='false'>Hide Properties</button>
+            {else}
+                <button class='sg_strain_expand_properties' data-kind='new_experiment' data-expanded-properties='true'>Show Properties</button>
+            {/if}
+        {else}
+            <button class='sg_expand' data-kind='new_experiment'  data-expanded='true'>Expand</button>
+        {/if}
+        &nbsp;
+        <button>Clear</button>
+        <button>Mate</button>
+
+    </div>
+    {if $experiment.expanded}
+    <div class='sg_experiment_parents'>
+        <div class='sg_experiment_parent'>
+            Drop strain here
         </div>
-    {/foreach}
+        <div class='sg_experiment_parent'>
+            Drop strain here
+        </div>
+    </div>
+    {/if}
 </div>
 {/template}
 
@@ -53,38 +148,28 @@
 */
 {template .experiment}
 <div class='sg_experiment_box'>
-    <div class='sg_experiment_heading'>
-        {call .experiment_heading}
-        {/call}
+    <div class='sg_title_box'>
+        Experiment 1
+        <button>Expand</button>
+        <button>Show Visuals</button>
+        <button>Show Properties</button>
+        &nbsp;
+        <button>Rename</button>
+        <button>Add progenies</button>
     </div>
-    <div class='sg_experiment_parents'></div>
-    <div class='sg_experiment_summary'></div>
 </div>
-{/template}
 
-/**
-*
-*/
-{template .experiment_heading}
-
-    <div class='sg_experiment_title_group'>
-    <div class='sg_experiment_title'>
-        Title
+<div class='sg_experiment_box'>
+    <div class='sg_title_box'>
+        Experiment 2
+        <button>Expand</button>
+        <button>Show Visuals</button>
+        <button>Show Properties</button>
+        &nbsp;
+        <button>Rename</button>
+        <button>Add progenies</button>
     </div>
-    <div class='sg_experiment_commands'>
-        <button>Mate</button>
-        <button>Save</button>
-        <button>Discard</button>
-    </div>
-    </div>
-    <div class='sg_experiment_parents'>
-        <div class='sg_experiment_parent'>
-            P1
-        </div>
-        <div class='sg_experiment_parent'>
-            P2
-        </div>
-    </div>
+</div>
 {/template}
 
 /**
@@ -93,8 +178,6 @@
 {template .all_experiments}
 <div class='sg_experiments_history_box'>
     <div class='sg_experiment_heading'>
-        {call .experiment_heading}
-        {/call}
     </div>
     <div class='sg_experiment_parents'></div>
     <div class='sg_experiment_summary'></div>
