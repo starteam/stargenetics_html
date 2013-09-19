@@ -42,10 +42,7 @@
 
 .sg_s_strain_box {
     display: inline-block;
-    width: 125px;
-    height: 80px;
-    border: black solid 1px;
-    margin: 5px;
+    margin: 10px;
 }
 
 .sg_strain_title {
@@ -58,9 +55,8 @@
 .sg_strain_visual {
     display: block;
     vertical-align: top;
-    width: 100%;
-    height: 55px;
-    background-color: blueviolet;
+    text-align:center;
+    vertical-align: text-bottom;
     cursor: move;
 }
 

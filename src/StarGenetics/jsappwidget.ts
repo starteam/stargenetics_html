@@ -1,6 +1,7 @@
 /// <reference path="state.ts" />
 /// <reference path="config.d.ts" />
 /// <reference path="jsappmodel.ts" />
+/// <reference path="visualizers/smiley.ts" />
 /// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
 /// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
 /// <reference path="../../../starx/src/StarX/lib/jquery-ui-1.8.x.d.ts" />
@@ -15,8 +16,9 @@ var SGUIMAIN:any = require("StarGenetics/sg_client_mainframe.soy");
 import json_sample_model = require("StarGenetics/json_sample_model");
 import SGModel = require("StarGenetics/jsappmodel");
 import SGState = require("state");
-
-var $:JQueryStatic = jQuery;
+import SGSmiley = require("StarGenetics/visualizers/smiley");
+declare var jQuery;
+var $ = jQuery;
 
 export class StarGeneticsJSAppWidget {
     state:SGState.StarGeneticsState;
@@ -130,6 +132,36 @@ export class StarGeneticsJSAppWidget {
                     console.info("liststrains OK");
                     var strains = data.payload.strains;
                     console.info("strains is ");
+                    console.info(data);
+
+                    self.model.ui.strains.set_list(strains);
+                    console.info(self.model.ui.strains.list);
+                    self.show();
+                },
+                onerror: function (q) {
+                    window['e'] = this;
+                    window['q'] = q;
+                    window['qq'] = self;
+                    console.info("liststrains Got error!" + JSON.stringify(q));
+                }
+            }
+        });
+    }
+
+    update_experiments( experiments:SGModel.Experiment[] ) {
+        console.info("Running update_experiments");
+        var self:StarGeneticsJSAppWidget = this;
+        this.stargenetics_interface({
+            token: '1',
+            command: 'updateexperiments',
+            data: {
+                experiments: _.each( experiments, function(e) { return e.toJSON() })
+            },
+            callbacks: {
+                onsuccess: function (data, b) {
+                    console.info("liststrains OK");
+                    var strains = data.payload.strains;
+                    console.info("strains is ");
                     self.model.ui.strains.set_list(strains);
                     console.info(self.model.ui.strains.list);
                     self.show();
@@ -139,37 +171,63 @@ export class StarGeneticsJSAppWidget {
                 }
             }
         });
+
     }
 
     show() {
-        var self = this;
+        var self:StarGeneticsJSAppWidget = this;
         var main = $('.sg_workspace', '#' + this.config.element_id);
         main.html(SGUIMAIN.workspace({model: this.model}));
 
         $('.sg_expand').off('click').on('click', function () {
-            var collapsable:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
-            collapsable.expanded = $(this).data('expanded');
+            var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
+            c.expanded = $(this).data('expanded');
             self.show();
         });
         $('.sg_strain_expand_visuals').off('click').on('click', function () {
-            var collapsable:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
-            collapsable.visualsVisible = $(this).data('expanded-visuals');
+            var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
+            c.visualsVisible = $(this).data('expanded-visuals');
             self.show();
         });
         $('.sg_strain_expand_properties').off('click').on('click', function () {
-            var collapsable:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
-            collapsable.propertiesVisible = $(this).data('expanded-properties');
+            var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
+            c.propertiesVisible = $(this).data('expanded-properties');
             self.show();
         });
 
-        $('.sg_strain_box').draggable({cursor: "crosshair", revert: true});
+        $('.sg_clear_parents').off('click').on('click', function () {
+            var c:SGModel.Experiment = <SGModel.Experiment>self.model.ui.get($(this).data('kind'));
+            c.clearParents();
+            self.show();
+        });
+
+        $('.sg_new_experiment_mate').off('click').on('click', function () {
+            var c:SGModel.Experiment = <SGModel.Experiment>self.model.ui.get($(this).data('kind'));
+            c.clearParents();
+            self.show();
+        });
+
+        $('.sg_strain_box').draggable({revert: true});
         $('.sg_experiment_parent').droppable({accept: '.sg_strain_box',
             drop: function (e, ui) {
-                console.info(this);
-                console.info(e);
-                console.info(ui);
+                var target = $(this);
+                var source = ui.draggable;
 
+                var src_collection:SGModel.Collapsable = self.model.ui.get(source.data('kind'));
+                var src_strain:SGModel.Strain = src_collection.get(source.data('id'));
+                var target_collection:SGModel.Experiment = <SGModel.Experiment>self.model.ui.get(target.data('kind'));
+                target_collection.addParent(src_strain);
+                self.show();
             }});
+
+        var visualizer:SGSmiley.Smiley = new SGSmiley.Smiley();
+        $('.sg_strain_visual canvas').each( function(){
+            var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
+            var organism = c.get( $(this).data('id'));
+            visualizer.render($(this)[0],organism.properties );
+            window['c'] = this;
+            window['v'] = visualizer;
+        });
     }
 
 }

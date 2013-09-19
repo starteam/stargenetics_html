@@ -1,8 +1,9 @@
-define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__) {
+define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__, __SGSmiley__) {
     var SGUIMAIN = require("StarGenetics/sg_client_mainframe.soy");
     var json_sample_model = __json_sample_model__;
     var SGModel = __SGModel__;
     
+    var SGSmiley = __SGSmiley__;
 
     var $ = jQuery;
 
@@ -104,6 +105,38 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                         console.info("liststrains OK");
                         var strains = data.payload.strains;
                         console.info("strains is ");
+                        console.info(data);
+
+                        self.model.ui.strains.set_list(strains);
+                        console.info(self.model.ui.strains.list);
+                        self.show();
+                    },
+                    onerror: function (q) {
+                        window['e'] = this;
+                        window['q'] = q;
+                        window['qq'] = self;
+                        console.info("liststrains Got error!" + JSON.stringify(q));
+                    }
+                }
+            });
+        };
+
+        StarGeneticsJSAppWidget.prototype.update_experiments = function (experiments) {
+            console.info("Running update_experiments");
+            var self = this;
+            this.stargenetics_interface({
+                token: '1',
+                command: 'updateexperiments',
+                data: {
+                    experiments: _.each(experiments, function (e) {
+                        return e.toJSON();
+                    })
+                },
+                callbacks: {
+                    onsuccess: function (data, b) {
+                        console.info("liststrains OK");
+                        var strains = data.payload.strains;
+                        console.info("strains is ");
                         self.model.ui.strains.set_list(strains);
                         console.info(self.model.ui.strains.list);
                         self.show();
@@ -121,29 +154,55 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             main.html(SGUIMAIN.workspace({ model: this.model }));
 
             $('.sg_expand').off('click').on('click', function () {
-                var collapsable = self.model.ui.get($(this).data('kind'));
-                collapsable.expanded = $(this).data('expanded');
+                var c = self.model.ui.get($(this).data('kind'));
+                c.expanded = $(this).data('expanded');
                 self.show();
             });
             $('.sg_strain_expand_visuals').off('click').on('click', function () {
-                var collapsable = self.model.ui.get($(this).data('kind'));
-                collapsable.visualsVisible = $(this).data('expanded-visuals');
+                var c = self.model.ui.get($(this).data('kind'));
+                c.visualsVisible = $(this).data('expanded-visuals');
                 self.show();
             });
             $('.sg_strain_expand_properties').off('click').on('click', function () {
-                var collapsable = self.model.ui.get($(this).data('kind'));
-                collapsable.propertiesVisible = $(this).data('expanded-properties');
+                var c = self.model.ui.get($(this).data('kind'));
+                c.propertiesVisible = $(this).data('expanded-properties');
                 self.show();
             });
 
-            $('.sg_strain_box').draggable({ cursor: "crosshair", revert: true });
+            $('.sg_clear_parents').off('click').on('click', function () {
+                var c = self.model.ui.get($(this).data('kind'));
+                c.clearParents();
+                self.show();
+            });
+
+            $('.sg_new_experiment_mate').off('click').on('click', function () {
+                var c = self.model.ui.get($(this).data('kind'));
+                c.clearParents();
+                self.show();
+            });
+
+            $('.sg_strain_box').draggable({ revert: true });
             $('.sg_experiment_parent').droppable({
                 accept: '.sg_strain_box',
                 drop: function (e, ui) {
-                    console.info(this);
-                    console.info(e);
-                    console.info(ui);
+                    var target = $(this);
+                    var source = ui.draggable;
+
+                    var src_collection = self.model.ui.get(source.data('kind'));
+                    var src_strain = src_collection.get(source.data('id'));
+                    var target_collection = self.model.ui.get(target.data('kind'));
+                    target_collection.addParent(src_strain);
+                    self.show();
                 }
+            });
+
+            var visualizer = new SGSmiley.Smiley();
+            $('.sg_strain_visual canvas').each(function () {
+                var c = self.model.ui.get($(this).data('kind'));
+                var organism = c.get($(this).data('id'));
+                visualizer.render($(this)[0], organism.properties);
+                window['c'] = this;
+                window['v'] = visualizer;
             });
         };
         return StarGeneticsJSAppWidget;
