@@ -17,6 +17,8 @@ import json_sample_model = require("StarGenetics/json_sample_model");
 import SGModel = require("StarGenetics/jsappmodel");
 import SGState = require("state");
 import SGSmiley = require("StarGenetics/visualizers/smiley");
+import SGTests = require( "StarGenetics/tests/qunit");
+
 declare var jQuery;
 var $ = jQuery;
 
@@ -27,19 +29,93 @@ export class StarGeneticsJSAppWidget {
     model:SGModel.Top;
 
     constructor(state:SGState.StarGeneticsState, config:StarGeneticsConfig) {
+        var self:StarGeneticsJSAppWidget = this;
         this.state = state;
         this.config = config;
         this.init();
-        console.info(state);
         this.initModel();
+
+
+    }
+
+    /**
+     * This method loads GWT frame & waits for it to finish loading
+     */
+        init() {
+        var config = this.config;
+        $('#' + config.element_id).html("StarGenetics: ClientApp starting");
+        $('<iframe id="' + config.element_id + '_gwt" src="/StarGenetics/gwtframe.html"/>').appendTo($('#' + config.element_id).parent()).hide();
+        this.wait_for_sg_interface('#' + config.element_id + '_gwt', config, this);
+    }
+
+    /**
+     * This method loads GWT frame & waits for it to finish loading
+     */
+        wait_for_sg_interface(id, config, self) {
+        var iframe = $(id)[0];
+        var w = iframe['contentWindow'];
+
+        if (w.__sg_bg_exec) {
+
+            self.stargenetics_interface = w.__sg_bg_exec;
+            console.info("Got it!... the interface");
+            $('#' + config.element_id).html("StarGenetics: ClientApp running");
+            window['stargenetics_interface'] = self.stargenetics_interface;
+            self.postInit();
+
+        }
+        else {
+            setTimeout(function () {
+                self.wait_for_sg_interface(id, config, self)
+            }, 250);
+            console.info("Waiting...");
+        }
+    }
+
+    /**
+     * Post init executes when GWT is loaded
+     */
+        postInit() {
+        this.start_client_app();
+        this.testHook();
+    }
+
+    /**
+     * Start Client App loads initial UI
+     */
+        start_client_app() {
+        var self:StarGeneticsJSAppWidget = this;
+        var main = $('#' + this.config.element_id);
+        main.html(SGUIMAIN.main({config: this.config}));
+        $('.sg_open_ps', main).off('click').on('click', function () {
+            console.info("Click on open");
+            self.open();
+        });
+    }
+
+    /**
+     * Test Hook load QTest & if URL warrants it loads test suite
+     */
+        testHook() {
+        var self = this;
+        if (SGTests.isTesting()) {
+            SGTests.load(function (qunit) {
+                require(["StarGenetics/tests/suite"], function (suite) {
+                    suite.testSuite(qunit, self);
+                });
+            });
+        }
     }
 
     run() {
 
     }
 
-
-    initModel() {
+    /**
+     * This sets up model,
+     * TODO: in the future it will decide on model to load from StarX configuration
+     */
+        initModel() {
         var model = new SGModel.Top({
             backend: json_sample_model.model1,
             ui: {
@@ -56,45 +132,10 @@ export class StarGeneticsJSAppWidget {
         console.info(model);
     }
 
-    init() {
-        var config = this.config;
-        $('#' + config.element_id).html("StarGenetics: ClientApp starting");
-        $('<iframe id="' + config.element_id + '_gwt" src="/StarGenetics/gwtframe.html"/>').appendTo($('#' + config.element_id).parent()).hide();
-        this.wait_for_sg_interface('#' + config.element_id + '_gwt', config, this);
-    }
-
-    wait_for_sg_interface(id, config, self) {
-        var iframe = $(id)[0];
-        var w = iframe['contentWindow'];
-
-        if (w.__sg_bg_exec) {
-
-            self.stargenetics_interface = w.__sg_bg_exec;
-            console.info("Got it!... the interface");
-            $('#' + config.element_id).html("StarGenetics: ClientApp running");
-            window['stargenetics_interface'] = self.stargenetics_interface;
-            self.start_client_app(self);
-
-        }
-        else {
-            setTimeout(function () {
-                self.wait_for_sg_interface(id, config, self)
-            }, 250);
-            console.info("Waiting...");
-        }
-    }
-
-    start_client_app(self) {
-        var main = $('#' + this.config.element_id);
-        main.html(SGUIMAIN.main({config: this.config}));
-        $('.sg_open_ps', main).off('click').on('click', function () {
-            console.info("Click on open");
-            self.open();
-        });
-        self.open();
-    }
-
-    open() {
+    /**
+     * Opens StarGenetics backend with selected model
+     */
+        open(callbacks?) {
         var self:StarGeneticsJSAppWidget = this;
         this.stargenetics_interface({
             token: '1',
@@ -105,21 +146,21 @@ export class StarGeneticsJSAppWidget {
             },
             callbacks: {
                 onsuccess: function (a, b) {
-                    console.info("Gor OK! on open");
+                    SGTests.onsuccess(callbacks);
                     self.show();
-                    self.list_strains();
-                    console.info("Gor OK! on open done");
 
                 },
                 onerror: function () {
-                    console.info("Got error! on open");
+                    SGTests.onerror(callbacks);
                 }
             }
         });
-
     }
 
-    list_strains() {
+    /**
+     * Lists strains & relaods UI
+     */
+        list_strains(callbacks?) {
         console.info("Running liststrain");
         var self:StarGeneticsJSAppWidget = this;
         this.stargenetics_interface({
@@ -129,33 +170,32 @@ export class StarGeneticsJSAppWidget {
             },
             callbacks: {
                 onsuccess: function (data, b) {
-                    console.info("liststrains OK");
                     var strains = data.payload.strains;
-                    console.info("strains is ");
-                    console.info(data);
-
+                    SGTests.onsuccess(callbacks);
                     self.model.ui.strains.set_list(strains);
-                    console.info(self.model.ui.strains.list);
                     self.show();
                 },
                 onerror: function (q) {
-                    window['e'] = this;
-                    window['q'] = q;
-                    window['qq'] = self;
-                    console.info("liststrains Got error!" + JSON.stringify(q));
+                    SGTests.onerror(callbacks);
                 }
             }
         });
     }
 
-    update_experiments( experiments:SGModel.Experiment[] ) {
+    /**
+     * Run mating experiment
+     * @param experiments
+     */
+        update_experiments(experiments:SGModel.Experiment[]) {
         console.info("Running update_experiments");
         var self:StarGeneticsJSAppWidget = this;
         this.stargenetics_interface({
             token: '1',
             command: 'updateexperiments',
             data: {
-                experiments: _.each( experiments, function(e) { return e.toJSON() })
+                experiments: _.each(experiments, function (e) {
+                    return e.toJSON()
+                })
             },
             callbacks: {
                 onsuccess: function (data, b) {
@@ -174,7 +214,10 @@ export class StarGeneticsJSAppWidget {
 
     }
 
-    show() {
+    /**
+     * Redraws UI
+     */
+        show() {
         var self:StarGeneticsJSAppWidget = this;
         var main = $('.sg_workspace', '#' + this.config.element_id);
         main.html(SGUIMAIN.workspace({model: this.model}));
@@ -221,10 +264,10 @@ export class StarGeneticsJSAppWidget {
             }});
 
         var visualizer:SGSmiley.Smiley = new SGSmiley.Smiley();
-        $('.sg_strain_visual canvas').each( function(){
+        $('.sg_strain_visual canvas').each(function () {
             var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
-            var organism = c.get( $(this).data('id'));
-            visualizer.render($(this)[0],organism.properties );
+            var organism = c.get($(this).data('id'));
+            visualizer.render($(this)[0], organism.properties);
             window['c'] = this;
             window['v'] = visualizer;
         });

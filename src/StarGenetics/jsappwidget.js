@@ -1,20 +1,72 @@
-define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__, __SGSmiley__) {
+define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "StarGenetics/tests/qunit", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__, __SGSmiley__, __SGTests__) {
     var SGUIMAIN = require("StarGenetics/sg_client_mainframe.soy");
     var json_sample_model = __json_sample_model__;
     var SGModel = __SGModel__;
     
     var SGSmiley = __SGSmiley__;
+    var SGTests = __SGTests__;
 
     var $ = jQuery;
 
     var StarGeneticsJSAppWidget = (function () {
         function StarGeneticsJSAppWidget(state, config) {
+            var self = this;
             this.state = state;
             this.config = config;
             this.init();
-            console.info(state);
             this.initModel();
         }
+        StarGeneticsJSAppWidget.prototype.init = function () {
+            var config = this.config;
+            $('#' + config.element_id).html("StarGenetics: ClientApp starting");
+            $('<iframe id="' + config.element_id + '_gwt" src="/StarGenetics/gwtframe.html"/>').appendTo($('#' + config.element_id).parent()).hide();
+            this.wait_for_sg_interface('#' + config.element_id + '_gwt', config, this);
+        };
+
+        StarGeneticsJSAppWidget.prototype.wait_for_sg_interface = function (id, config, self) {
+            var iframe = $(id)[0];
+            var w = iframe['contentWindow'];
+
+            if (w.__sg_bg_exec) {
+                self.stargenetics_interface = w.__sg_bg_exec;
+                console.info("Got it!... the interface");
+                $('#' + config.element_id).html("StarGenetics: ClientApp running");
+                window['stargenetics_interface'] = self.stargenetics_interface;
+                self.postInit();
+            } else {
+                setTimeout(function () {
+                    self.wait_for_sg_interface(id, config, self);
+                }, 250);
+                console.info("Waiting...");
+            }
+        };
+
+        StarGeneticsJSAppWidget.prototype.postInit = function () {
+            this.start_client_app();
+            this.testHook();
+        };
+
+        StarGeneticsJSAppWidget.prototype.start_client_app = function () {
+            var self = this;
+            var main = $('#' + this.config.element_id);
+            main.html(SGUIMAIN.main({ config: this.config }));
+            $('.sg_open_ps', main).off('click').on('click', function () {
+                console.info("Click on open");
+                self.open();
+            });
+        };
+
+        StarGeneticsJSAppWidget.prototype.testHook = function () {
+            var self = this;
+            if (SGTests.isTesting()) {
+                SGTests.load(function (qunit) {
+                    require(["StarGenetics/tests/suite"], function (suite) {
+                        suite.testSuite(qunit, self);
+                    });
+                });
+            }
+        };
+
         StarGeneticsJSAppWidget.prototype.run = function () {
         };
 
@@ -35,42 +87,7 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             console.info(model);
         };
 
-        StarGeneticsJSAppWidget.prototype.init = function () {
-            var config = this.config;
-            $('#' + config.element_id).html("StarGenetics: ClientApp starting");
-            $('<iframe id="' + config.element_id + '_gwt" src="/StarGenetics/gwtframe.html"/>').appendTo($('#' + config.element_id).parent()).hide();
-            this.wait_for_sg_interface('#' + config.element_id + '_gwt', config, this);
-        };
-
-        StarGeneticsJSAppWidget.prototype.wait_for_sg_interface = function (id, config, self) {
-            var iframe = $(id)[0];
-            var w = iframe['contentWindow'];
-
-            if (w.__sg_bg_exec) {
-                self.stargenetics_interface = w.__sg_bg_exec;
-                console.info("Got it!... the interface");
-                $('#' + config.element_id).html("StarGenetics: ClientApp running");
-                window['stargenetics_interface'] = self.stargenetics_interface;
-                self.start_client_app(self);
-            } else {
-                setTimeout(function () {
-                    self.wait_for_sg_interface(id, config, self);
-                }, 250);
-                console.info("Waiting...");
-            }
-        };
-
-        StarGeneticsJSAppWidget.prototype.start_client_app = function (self) {
-            var main = $('#' + this.config.element_id);
-            main.html(SGUIMAIN.main({ config: this.config }));
-            $('.sg_open_ps', main).off('click').on('click', function () {
-                console.info("Click on open");
-                self.open();
-            });
-            self.open();
-        };
-
-        StarGeneticsJSAppWidget.prototype.open = function () {
+        StarGeneticsJSAppWidget.prototype.open = function (callbacks) {
             var self = this;
             this.stargenetics_interface({
                 token: '1',
@@ -81,19 +98,17 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                 },
                 callbacks: {
                     onsuccess: function (a, b) {
-                        console.info("Gor OK! on open");
+                        SGTests.onsuccess(callbacks);
                         self.show();
-                        self.list_strains();
-                        console.info("Gor OK! on open done");
                     },
                     onerror: function () {
-                        console.info("Got error! on open");
+                        SGTests.onerror(callbacks);
                     }
                 }
             });
         };
 
-        StarGeneticsJSAppWidget.prototype.list_strains = function () {
+        StarGeneticsJSAppWidget.prototype.list_strains = function (callbacks) {
             console.info("Running liststrain");
             var self = this;
             this.stargenetics_interface({
@@ -102,20 +117,13 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                 data: {},
                 callbacks: {
                     onsuccess: function (data, b) {
-                        console.info("liststrains OK");
                         var strains = data.payload.strains;
-                        console.info("strains is ");
-                        console.info(data);
-
+                        SGTests.onsuccess(callbacks);
                         self.model.ui.strains.set_list(strains);
-                        console.info(self.model.ui.strains.list);
                         self.show();
                     },
                     onerror: function (q) {
-                        window['e'] = this;
-                        window['q'] = q;
-                        window['qq'] = self;
-                        console.info("liststrains Got error!" + JSON.stringify(q));
+                        SGTests.onerror(callbacks);
                     }
                 }
             });
