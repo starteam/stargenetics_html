@@ -13,12 +13,6 @@ define(["require", "exports"], function(require, exports) {
     }
     exports.isTesting = isTesting;
 
-    function onSuccess(callbacks) {
-        if (callbacks && callbacks.onsuccess) {
-            callbacks.onsuccess();
-        }
-    }
-    exports.onSuccess = onSuccess;
     function onsuccess(callbacks) {
         if (callbacks && callbacks['onsuccess']) {
             callbacks['onsuccess']();

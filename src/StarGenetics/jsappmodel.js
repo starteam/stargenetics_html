@@ -203,10 +203,17 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
             enumerable: true,
             configurable: true
         });
+
+        Experiment.prototype.update_experiment = function (data) {
+            this.__data__.list = data.children;
+            this.__data__.parents = data.parents;
+            this.__data__.name = data.name;
+        };
         return Experiment;
     })(Collapsable);
     exports.Experiment = Experiment;
     Base.readOnlyWrappedList(Experiment, "parents", Strain);
+    Base.readOnlyField(Experiment, "id", null);
 
     var Strains = (function (_super) {
         __extends(Strains, _super);
@@ -226,6 +233,23 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     })(Experiment);
     exports.NewExperiment = NewExperiment;
 
+    var Experiments = (function (_super) {
+        __extends(Experiments, _super);
+        function Experiments() {
+            _super.apply(this, arguments);
+        }
+        Experiments.prototype.update_experiment = function (experiment) {
+            if (!_.find(this.list, function (e) {
+                return (e.id == experiment.id);
+            })) {
+                this.__data__.list.push(experiment.toJSON());
+            }
+        };
+        return Experiments;
+    })(Base);
+    exports.Experiments = Experiments;
+    Base.readOnlyWrappedList(Experiments, "list", Experiment);
+
     var UIModel = (function (_super) {
         __extends(UIModel, _super);
         function UIModel() {
@@ -240,11 +264,18 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
                 throw "Error " + str;
             }
         };
+
+        UIModel.prototype.clearNewExperiment = function () {
+            this.__data__.new_experiment = {
+                list: []
+            };
+        };
         return UIModel;
     })(Base);
     exports.UIModel = UIModel;
     Base.readOnlyWrappedField(UIModel, "strains", Strains);
     Base.readOnlyWrappedField(UIModel, "new_experiment", NewExperiment);
+    Base.readOnlyWrappedField(UIModel, "experiments", Experiments);
 
     var Top = (function (_super) {
         __extends(Top, _super);

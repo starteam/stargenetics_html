@@ -84,23 +84,23 @@ export class Strain extends Base {
     get properties() {
         var ret = {};
         var phenotypes = this.__data__['phenotype'];
-        console.info( "properties");
-        console.info( phenotypes);
+        console.info("properties");
+        console.info(phenotypes);
 
         if (phenotypes) {
             _.each(phenotypes, function (v, k) {
                 if (typeof(v) === 'string' && v.charAt(0) == '{') {
                     try {
                         var q = JSON.parse(v);
-                        if(typeof( q['text'] === 'string'))
-                        {
+                        if (typeof( q['text'] === 'string')) {
                             ret[k] = q;
                             return;
                         }
-                    } finally {}
+                    } finally {
+                    }
 
                 }
-                ret[k] = {text:v};
+                ret[k] = {text: v};
             });
         }
         return ret;
@@ -158,6 +158,7 @@ Base.readOnlyWrappedList(Collapsable, "list", Strain);
  * Experiment class adds parents to the mix
  */
 export class Experiment extends Collapsable {
+    id:string;
     parents:Strain[];
 
     constructor(q:{}) {
@@ -197,8 +198,16 @@ export class Experiment extends Collapsable {
     get canclearparents():boolean {
         return this.parents.length != 0;
     }
+
+    update_experiment(data:any)
+    {
+        this.__data__.list = data.children;
+        this.__data__.parents = data.parents;
+        this.__data__.name = data.name;
+    }
 }
 Base.readOnlyWrappedList(Experiment, "parents", Strain);
+Base.readOnlyField(Experiment, "id", null);
 
 /**
  * Strains box
@@ -208,8 +217,20 @@ export class Strains extends Collapsable {
 }
 
 export class NewExperiment extends Experiment {
-
 }
+
+export class Experiments extends Base {
+    list:Experiment[];
+
+    update_experiment(experiment:Experiment) {
+        if (!_.find(this.list, function (e) {
+            return(e.id == experiment.id);
+        })) {
+            this.__data__.list.push(experiment.toJSON());
+        }
+    }
+}
+Base.readOnlyWrappedList(Experiments, "list", Experiment);
 
 /**
  * UIModel
@@ -218,6 +239,7 @@ export class UIModel extends Base {
     // here we declare fields defined with Base.defineStaticField below
     strains:Strains;
     new_experiment:NewExperiment;
+    experiments:Experiments;
 
     get(str:string):Collapsable {
         if (str == 'strains') {
@@ -230,9 +252,17 @@ export class UIModel extends Base {
             throw "Error " + str;
         }
     }
+
+    clearNewExperiment()
+    {
+        this.__data__.new_experiment = {
+            list:[]
+        }
+    }
 }
 Base.readOnlyWrappedField(UIModel, "strains", Strains);
 Base.readOnlyWrappedField(UIModel, "new_experiment", NewExperiment);
+Base.readOnlyWrappedField(UIModel, "experiments", Experiments);
 
 
 /**

@@ -14,11 +14,6 @@ export function isTesting() {
     return ret;
 }
 
-export function onSuccess(callbacks) {
-    if (callbacks && callbacks.onsuccess) {
-        callbacks.onsuccess();
-    }
-}
 export function onsuccess(callbacks) {
     if (callbacks && callbacks['onsuccess']) {
         callbacks['onsuccess']();

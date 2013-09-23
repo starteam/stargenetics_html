@@ -1,5 +1,6 @@
 define(["require", "exports"], function(require, exports) {
     
+    
 
     var $ = jQuery;
 
@@ -18,6 +19,7 @@ define(["require", "exports"], function(require, exports) {
         expandnewexperiment();
         collapsenewexperiment();
         expandnewexperiment();
+        set_experiment();
     }
     exports.testSuite = testSuite;
 
@@ -73,6 +75,26 @@ define(["require", "exports"], function(require, exports) {
 
     function collapsenewexperiment() {
         expand('new_experiment', 'false');
+    }
+
+    function set_experiment() {
+        q.test("set_new_experiment", function () {
+            $('.sg_clear_parents[data-kind="new_experiment"]').click();
+            var list = app.model.ui.strains.list;
+            var experiment = app.model.ui.get('new_experiment');
+            app.add_parent(experiment, list[0]);
+            app.add_parent(experiment, list[1]);
+            app.mate(experiment, {
+                onsuccess: function () {
+                    console.info("test_liststrains passed");
+                    q.ok(true);
+                },
+                onerror: function () {
+                    console.info("test_liststrains failed");
+                    q.ok(false);
+                }
+            });
+        });
     }
 });
 //@ sourceMappingURL=suite.js.map

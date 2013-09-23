@@ -124,6 +124,9 @@ export class StarGeneticsJSAppWidget {
                 },
                 new_experiment: {
                     list: []
+                },
+                experiments: {
+                    list: []
                 }
             }
         });
@@ -183,31 +186,52 @@ export class StarGeneticsJSAppWidget {
     }
 
     /**
+     * add parent
+     * @param experiments
+     */
+        add_parent(experiment:SGModel.Experiment, strain:SGModel.Strain) {
+        experiment.addParent(strain);
+    }
+
+    /**
      * Run mating experiment
      * @param experiments
      */
-        update_experiments(experiments:SGModel.Experiment[]) {
+    mate(experiment:SGModel.Experiment,callbacks?) {
+        this.update_experiments(experiment, 'mate',callbacks);
+    }
+
+    /**
+     * Run update experiment
+     * @param experiments
+     */
+        update_experiments(experiment:SGModel.Experiment, command:string,callbacks?) {
         console.info("Running update_experiments");
+        console.info( experiment.toJSON());
         var self:StarGeneticsJSAppWidget = this;
         this.stargenetics_interface({
             token: '1',
-            command: 'updateexperiments',
+            command: 'updateexperiment',
             data: {
-                experiments: _.each(experiments, function (e) {
-                    return e.toJSON()
-                })
+                experiment: experiment.toJSON(),
+                command: command
             },
             callbacks: {
                 onsuccess: function (data, b) {
-                    console.info("liststrains OK");
-                    var strains = data.payload.strains;
-                    console.info("strains is ");
-                    self.model.ui.strains.set_list(strains);
-                    console.info(self.model.ui.strains.list);
+                    console.info("update_experiments OK");
+                    console.info(data);
+                    console.info(b);
+                    experiment.update_experiment(data.payload);
+                    self.model.ui.experiments.update_experiment(experiment);
+                    if (experiment instanceof SGModel.NewExperiment) {
+                        self.model.ui.clearNewExperiment();
+                    }
+                    SGTests.onsuccess(callbacks);
                     self.show();
                 },
                 onerror: function () {
-                    console.info("liststrains Got error!");
+                    SGTests.onsuccess(callbacks);
+                    console.info("update_experiments Got error!");
                 }
             }
         });
@@ -251,15 +275,21 @@ export class StarGeneticsJSAppWidget {
         });
 
         $('.sg_strain_box').draggable({revert: true});
-        $('.sg_experiment_parent').droppable({accept: '.sg_strain_box',
+        $('.sg_experiment_parent').droppable({/*accept: '.sg_strain_box',*/
             drop: function (e, ui) {
+                console.info("Hello World");
+                console.info(this);
+                console.info(e);
+                console.info(ui);
+
+
                 var target = $(this);
                 var source = ui.draggable;
 
                 var src_collection:SGModel.Collapsable = self.model.ui.get(source.data('kind'));
                 var src_strain:SGModel.Strain = src_collection.get(source.data('id'));
                 var target_collection:SGModel.Experiment = <SGModel.Experiment>self.model.ui.get(target.data('kind'));
-                target_collection.addParent(src_strain);
+                this.add_parent(target_collection, src_strain);
                 self.show();
             }});
 
