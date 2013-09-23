@@ -29,8 +29,8 @@ sg_client_mainframe.workspace = function(opt_data, opt_sb) {
   output.append('<div class=\'sg_workspace\'><div class=\'sg_workspace_title\'>StarGenetics Title</div>');
   sg_client_mainframe.strains({strains: opt_data.model.ui.strains}, output);
   sg_client_mainframe.new_experiment({experiment: opt_data.model.ui.new_experiment}, output);
-  sg_client_mainframe.experiment(null, output);
-  output.append('<div class=\'sg_experiments_history_box\'><div class=\'sg_experiment_heading\'></div><div class=\'sg_experiment_parents\'></div><div class=\'sg_experiment_summary\'></div></div></div>');
+  sg_client_mainframe.all_experiments({experiments: opt_data.model.ui.experiments}, output);
+  output.append('</div>');
   return opt_sb ? '' : output.toString();
 };
 
@@ -112,22 +112,25 @@ sg_client_mainframe.new_experiment = function(opt_data, opt_sb) {
  * @return {string}
  * @notypecheck
  */
-sg_client_mainframe.experiment = function(opt_data, opt_sb) {
-  var output = opt_sb || new soy.StringBuilder();
-  output.append('<div class=\'sg_experiment_box\'><div class=\'sg_title_box\'>Experiment 1<button>Expand</button><button>Show Visuals</button><button>Show Properties</button>&nbsp;<button>Rename</button><button>Add progenies</button></div></div><div class=\'sg_experiment_box\'><div class=\'sg_title_box\'>Experiment 2<button>Expand</button><button>Show Visuals</button><button>Show Properties</button>&nbsp;<button>Rename</button><button>Add progenies</button></div></div>');
-  return opt_sb ? '' : output.toString();
-};
-
-
-/**
- * @param {Object.<string, *>=} opt_data
- * @param {soy.StringBuilder=} opt_sb
- * @return {string}
- * @notypecheck
- */
 sg_client_mainframe.all_experiments = function(opt_data, opt_sb) {
   var output = opt_sb || new soy.StringBuilder();
-  output.append('<div class=\'sg_experiments_history_box\'><div class=\'sg_experiment_heading\'></div><div class=\'sg_experiment_parents\'></div><div class=\'sg_experiment_summary\'></div></div>');
+  var experimentList132 = opt_data.experiments.list;
+  var experimentListLen132 = experimentList132.length;
+  for (var experimentIndex132 = 0; experimentIndex132 < experimentListLen132; experimentIndex132++) {
+    var experimentData132 = experimentList132[experimentIndex132];
+    output.append('<div class=\'sg_experiment_box\'><div class=\'sg_title_box\'>', soy.$$escapeHtml(experimentData132.name), (experimentData132.expanded) ? '<button class=\'sg_expand\' data-kind=\'' + soy.$$escapeHtml(experimentData132.id) + '\' data-expanded=\'false\'>Collaps</button>' + ((experimentData132.visualsVisible) ? '<button class=\'sg_strain_expand_visuals\' data-kind=\'' + soy.$$escapeHtml(experimentData132.id) + '\'  data-expanded-visuals=\'false\'>Hide Visuals</button>' : '<button class=\'sg_strain_expand_visuals\' data-kind=\'' + soy.$$escapeHtml(experimentData132.id) + '\' data-expanded-visuals=\'true\'>Show Visuals</button>') + ((experimentData132.propertiesVisible) ? '<button class=\'sg_strain_expand_properties\' data-kind=\'' + soy.$$escapeHtml(experimentData132.id) + '\' data-expanded-properties=\'false\'>Hide Properties</button>' : '<button class=\'sg_strain_expand_properties\' data-kind=\'' + soy.$$escapeHtml(experimentData132.id) + '\' data-expanded-properties=\'true\'>Show Properties</button>') : '<button class=\'sg_expand\' data-kind=\'' + soy.$$escapeHtml(experimentData132.id) + '\'  data-expanded=\'true\'>Expand</button>', '&nbsp;', (experimentData132.canclearparents) ? '<button class=\'sg_rename\' data-kind="' + soy.$$escapeHtml(experimentData132.id) + '">Rename</button>' : '', (experimentData132.canmate) ? '<button class=\'sg_experiment_mate\'>Add progenies</button>' : '', '</div>');
+    if (experimentData132.expanded) {
+      output.append('<div class=\'sg_experiment_parents\'>', (experimentData132.parents.length < 1) ? '<div class=\'sg_experiment_parent\' data-kind=\'new_experiment\'>Drop strain here</div>' : '<div class=\'sg_experiment_parent\' data-kind=\'new_experiment\' data-id=\'' + soy.$$escapeHtml(experimentData132.parents[0].id) + '\'>' + soy.$$escapeHtml(experimentData132.parents[0].name) + '</div>', (experimentData132.parents.length < 2) ? '<div class=\'sg_experiment_parent\' data-kind=\'new_experiment\'>Drop strain here</div>' : '<div class=\'sg_experiment_parent\' data-kind=\'new_experiment\' data-id=\'' + soy.$$escapeHtml(experimentData132.parents[1].id) + '\'>' + soy.$$escapeHtml(experimentData132.parents[1].name) + '</div>', '</div><div class=\'sg_experiment_progeny_list\'>');
+      var oList194 = experimentData132.list;
+      var oListLen194 = oList194.length;
+      for (var oIndex194 = 0; oIndex194 < oListLen194; oIndex194++) {
+        var oData194 = oList194[oIndex194];
+        output.append('<div class=\'sg_experiment_progeny\' data-strain=\'', soy.$$escapeHtml(oData194.id), '\' data-kind=\'', soy.$$escapeHtml(experimentData132.id), '\'>', soy.$$escapeHtml(oData194.name), '</div>');
+      }
+      output.append('</div>');
+    }
+    output.append('</div>');
+  }
   return opt_sb ? '' : output.toString();
 };
 for(var i in sg_client_mainframe) { exports[i] = sg_client_mainframe[i] };

@@ -219,7 +219,7 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                     var src_collection = self.model.ui.get(source.data('kind'));
                     var src_strain = src_collection.get(source.data('id'));
                     var target_collection = self.model.ui.get(target.data('kind'));
-                    this.add_parent(target_collection, src_strain);
+                    self.add_parent(target_collection, src_strain);
                     self.show();
                 }
             });

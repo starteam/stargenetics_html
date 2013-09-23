@@ -28,9 +28,8 @@
         {call .new_experiment}
             {param experiment: $model.ui.new_experiment /}
         {/call}
-        {call .experiment}
-        {/call}
         {call .all_experiments}
+            {param experiments:$model.ui.experiments /}
         {/call}
     </div>
 {/template}
@@ -161,41 +160,68 @@
 
 /**
 *   Active Experiment
-*/
-{template .experiment}
-<div class='sg_experiment_box'>
-    <div class='sg_title_box'>
-        Experiment 1
-        <button>Expand</button>
-        <button>Show Visuals</button>
-        <button>Show Properties</button>
-        &nbsp;
-        <button>Rename</button>
-        <button>Add progenies</button>
-    </div>
-</div>
-
-<div class='sg_experiment_box'>
-    <div class='sg_title_box'>
-        Experiment 2
-        <button>Expand</button>
-        <button>Show Visuals</button>
-        <button>Show Properties</button>
-        &nbsp;
-        <button>Rename</button>
-        <button>Add progenies</button>
-    </div>
-</div>
-{/template}
-
-/**
-*   Active Experiment
+* @param experiments
 */
 {template .all_experiments}
-<div class='sg_experiments_history_box'>
-    <div class='sg_experiment_heading'>
+{foreach $experiment in $experiments.list}
+<div class='sg_experiment_box'>
+    <div class='sg_title_box'>
+        {$experiment.name}
+                {if $experiment.expanded}
+            <button class='sg_expand' data-kind='{$experiment.id}' data-expanded='false'>Collaps</button>
+            {if $experiment.visualsVisible}
+            <button class='sg_strain_expand_visuals' data-kind='{$experiment.id}'  data-expanded-visuals='false'>Hide Visuals</button>
+            {else}
+            <button class='sg_strain_expand_visuals' data-kind='{$experiment.id}' data-expanded-visuals='true'>Show Visuals</button>
+            {/if}
+            {if $experiment.propertiesVisible}
+                <button class='sg_strain_expand_properties' data-kind='{$experiment.id}' data-expanded-properties='false'>Hide Properties</button>
+            {else}
+                <button class='sg_strain_expand_properties' data-kind='{$experiment.id}' data-expanded-properties='true'>Show Properties</button>
+            {/if}
+        {else}
+            <button class='sg_expand' data-kind='{$experiment.id}'  data-expanded='true'>Expand</button>
+        {/if}
+        &nbsp;
+        {if $experiment.canclearparents}
+        <button class='sg_rename' data-kind="{$experiment.id}">Rename</button>
+        {/if}
+
+        {if $experiment.canmate}
+            <button class='sg_experiment_mate'>Add progenies</button>
+        {/if}
     </div>
-    <div class='sg_experiment_parents'></div>
-    <div class='sg_experiment_summary'></div>
+        {if $experiment.expanded}
+        <div class='sg_experiment_parents'>
+            {if $experiment.parents.length <1}
+            <div class='sg_experiment_parent' data-kind='new_experiment'>
+                Drop strain here
+            </div>
+            {else}
+            <div class='sg_experiment_parent' data-kind='new_experiment' data-id='{$experiment.parents[0].id}'>
+                {$experiment.parents[0].name}
+            </div>
+            {/if}
+            {if $experiment.parents.length <2}
+            <div class='sg_experiment_parent' data-kind='new_experiment'>
+                Drop strain here
+            </div>
+            {else}
+            <div class='sg_experiment_parent' data-kind='new_experiment' data-id='{$experiment.parents[1].id}'>
+                {$experiment.parents[1].name}
+            </div>
+            {/if}
+        </div>
+        <div class='sg_experiment_progeny_list'>
+        {foreach $o in $experiment.list}
+            <div class='sg_experiment_progeny' data-strain='{$o.id}' data-kind='{$experiment.id}'>
+                {$o.name}
+            </div>
+        {/foreach}
+        </div>
+
+        {/if}
 </div>
+{/foreach}
+
 {/template}

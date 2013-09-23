@@ -199,8 +199,7 @@ export class Experiment extends Collapsable {
         return this.parents.length != 0;
     }
 
-    update_experiment(data:any)
-    {
+    update_experiment(data:any) {
         this.__data__.list = data.children;
         this.__data__.parents = data.parents;
         this.__data__.name = data.name;
@@ -249,14 +248,23 @@ export class UIModel extends Base {
             return this.new_experiment;
         }
         else {
-            throw "Error " + str;
+            var experiment = _.find(this.experiments.list, function (e) {
+                return e.id == str
+            });
+            if( experiment )
+            {
+                return experiment;
+            }
+            else
+            {
+                throw "Error " + str;
+            }
         }
     }
 
-    clearNewExperiment()
-    {
+    clearNewExperiment() {
         this.__data__.new_experiment = {
-            list:[]
+            list: []
         }
     }
 }

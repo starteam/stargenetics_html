@@ -289,7 +289,7 @@ export class StarGeneticsJSAppWidget {
                 var src_collection:SGModel.Collapsable = self.model.ui.get(source.data('kind'));
                 var src_strain:SGModel.Strain = src_collection.get(source.data('id'));
                 var target_collection:SGModel.Experiment = <SGModel.Experiment>self.model.ui.get(target.data('kind'));
-                this.add_parent(target_collection, src_strain);
+                self.add_parent(target_collection, src_strain);
                 self.show();
             }});
 

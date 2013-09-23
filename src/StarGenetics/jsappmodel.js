@@ -261,7 +261,14 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
             } else if (str == 'new_experiment') {
                 return this.new_experiment;
             } else {
-                throw "Error " + str;
+                var experiment = _.find(this.experiments.list, function (e) {
+                    return e.id == str;
+                });
+                if (experiment) {
+                    return experiment;
+                } else {
+                    throw "Error " + str;
+                }
             }
         };
 
