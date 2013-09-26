@@ -32,8 +32,8 @@ export class StarGeneticsJSAppWidget {
         var self:StarGeneticsJSAppWidget = this;
         this.state = state;
         this.config = config;
-        this.init();
         this.initModel();
+        this.init();
 
 
     }
@@ -52,6 +52,9 @@ export class StarGeneticsJSAppWidget {
      * This method loads GWT frame & waits for it to finish loading
      */
         wait_for_sg_interface(id, config, self) {
+        console.info("wait_for_sg_interface");
+        console.info(self.model.ui);
+
         var iframe = $(id)[0];
         var w = iframe['contentWindow'];
 
@@ -133,6 +136,8 @@ export class StarGeneticsJSAppWidget {
         this.model = model;
         window['model'] = model;
         console.info(model);
+        console.info("backend:");
+        console.info(json_sample_model.model1);
     }
 
     /**
@@ -197,17 +202,17 @@ export class StarGeneticsJSAppWidget {
      * Run mating experiment
      * @param experiments
      */
-    mate(experiment:SGModel.Experiment,callbacks?) {
-        this.update_experiments(experiment, 'mate',callbacks);
+        mate(experiment:SGModel.Experiment, callbacks?) {
+        this.update_experiments(experiment, 'mate', callbacks);
     }
 
     /**
      * Run update experiment
      * @param experiments
      */
-        update_experiments(experiment:SGModel.Experiment, command:string,callbacks?) {
+        update_experiments(experiment:SGModel.Experiment, command:string, callbacks?) {
         console.info("Running update_experiments");
-        console.info( experiment.toJSON());
+        console.info(experiment.toJSON());
         var self:StarGeneticsJSAppWidget = this;
         this.stargenetics_interface({
             token: '1',
@@ -270,7 +275,12 @@ export class StarGeneticsJSAppWidget {
 
         $('.sg_new_experiment_mate').off('click').on('click', function () {
             var c:SGModel.Experiment = <SGModel.Experiment>self.model.ui.get($(this).data('kind'));
-            c.clearParents();
+            self.mate(c, {onsuccess: function () {
+                console.info("Mate success!");
+
+            }, onerror: function () {
+                console.info("Mate error!");
+            }});
             self.show();
         });
 

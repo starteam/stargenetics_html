@@ -73,6 +73,22 @@ export class Base {
 
     }
 
+    static readOnlyWrappedListReverse(cls, name, wrapper) {
+        Object.defineProperty(cls.prototype, name, {
+            'get': function () {
+                if (typeof this.__data__[name] === 'undefined') {
+                    throw "__data__[" + name + "] is undefined for " + cls;
+                }
+                return _.reverse(_.map(this.__data__[name], function (q) {
+                    return new wrapper(q)
+                }));
+            },
+            'enumerable': true,
+            'configurable': true
+        });
+
+    }
+
 }
 
 /**
@@ -154,13 +170,55 @@ Base.defineStaticRWField(Collapsable, "propertiesVisible", false);
 Base.defineStaticRWField(Collapsable, "name", "--name not defined--");
 Base.readOnlyWrappedList(Collapsable, "list", Strain);
 
+export class ExperimentStatistics extends Base {
+    experiment:Experiment;
+
+    sex_obj:any;
+
+    constructor(e:Experiment)
+    {
+        this.experiment = e;
+        super({});
+    }
+
+    public static sex_generate_internal(list)
+    {
+        var males = 0;
+        var females = 0;
+        _.each(list,function(e){
+            if( e.sex == 'MALE' )
+            {
+                males++;
+            }
+            else
+            {
+                females++;
+            }
+        });
+        return {
+            males: males,
+            females: females
+        };
+    }
+
+    get sex()
+    {
+        if(! this.sex_obj)
+        {
+            this.sex_obj = ExperimentStatistics.sex_generate_internal(this.experiment.list);
+        }
+        return this.sex_obj;
+    }
+
+}
+
 /**
  * Experiment class adds parents to the mix
  */
 export class Experiment extends Collapsable {
     id:string;
     parents:Strain[];
-
+    stats_cache:ExperimentStatistics;
     constructor(q:{}) {
         if (typeof(q['parents']) === 'undefined') {
             q['parents'] = [];
@@ -203,7 +261,45 @@ export class Experiment extends Collapsable {
         this.__data__.list = data.children;
         this.__data__.parents = data.parents;
         this.__data__.name = data.name;
+        this.__data__.id = data.id;
+        this.stats_cache = undefined;
+        this.update_properties([this.list, this.parents]);
     }
+    get stats():ExperimentStatistics {
+        if(! this.stats_cache )
+        {
+            this.stats_cache = new ExperimentStatistics(this);
+        }
+        return this.stats_cache;
+    }
+
+    get parent():{[s:string]:Strain} {
+        var parents = this.parents;
+        var ret = {};
+        _.each( parents, function(p) {
+            ret[ p.sex == 'MALE' ? 'male' : 'female' ] = p ;
+        });
+        return ret;
+    }
+
+    get phenotypes():any {
+        var group = _.groupBy(this.list , function(q) { return JSON.stringify(q.properties)});
+        var ret = {};
+        _.map(group, function(value,key){
+            var sex_obj = ExperimentStatistics.sex_generate_internal( value );
+            ret[key] = {
+                list: value,
+                males:sex_obj.males,
+                females:sex_obj.females,
+                properties: value[0].properties,
+                top_male: _.find(value, function(e) { return e.sex == 'MALE'}),
+                top_female:_.find(value, function(e) { return e.sex == 'FEMALE'})
+            }
+        });
+        return ret;
+    }
+
+
 }
 Base.readOnlyWrappedList(Experiment, "parents", Strain);
 Base.readOnlyField(Experiment, "id", null);
@@ -222,10 +318,15 @@ export class Experiments extends Base {
     list:Experiment[];
 
     update_experiment(experiment:Experiment) {
-        if (!_.find(this.list, function (e) {
+        var exp = _.find(this.list, function (e) {
             return(e.id == experiment.id);
-        })) {
-            this.__data__.list.push(experiment.toJSON());
+        });
+        console.info( "Experiments::update_experiment:" + exp );
+        if (!exp) {
+            console.info( "Experiments::update_experiment push!" );
+            this.__data__.list.unshift(experiment.toJSON());
+            console.info( this.__data__.list );
+            console.info( this.list );
         }
     }
 }

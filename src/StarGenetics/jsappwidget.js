@@ -13,8 +13,8 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             var self = this;
             this.state = state;
             this.config = config;
-            this.init();
             this.initModel();
+            this.init();
         }
         StarGeneticsJSAppWidget.prototype.init = function () {
             var config = this.config;
@@ -24,6 +24,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
         };
 
         StarGeneticsJSAppWidget.prototype.wait_for_sg_interface = function (id, config, self) {
+            console.info("wait_for_sg_interface");
+            console.info(self.model.ui);
+
             var iframe = $(id)[0];
             var w = iframe['contentWindow'];
 
@@ -88,6 +91,8 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             this.model = model;
             window['model'] = model;
             console.info(model);
+            console.info("backend:");
+            console.info(json_sample_model.model1);
         };
 
         StarGeneticsJSAppWidget.prototype.open = function (callbacks) {
@@ -201,7 +206,14 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
 
             $('.sg_new_experiment_mate').off('click').on('click', function () {
                 var c = self.model.ui.get($(this).data('kind'));
-                c.clearParents();
+                self.mate(c, {
+                    onsuccess: function () {
+                        console.info("Mate success!");
+                    },
+                    onerror: function () {
+                        console.info("Mate error!");
+                    }
+                });
                 self.show();
             });
 

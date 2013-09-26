@@ -35,6 +35,19 @@
 {/template}
 
 /**
+* @param strain
+* @param visuals
+* @param kind
+*/
+{template .strain}
+<div class='sg_strain_box sg_s_strain_box' data-kind='{$kind}' data-id="{$strain['id']}">
+                    <div class='sg_strain_title'>{$strain['name']}</div>
+                    {if $visuals}
+                    <div class='sg_strain_visual'><canvas data-kind='{$kind}' data-id='{$strain['id']}'></canvas></div>
+                    {/if}
+                </div>
+{/template}
+/**
 *   Strains
 * @param strains
 */
@@ -87,12 +100,11 @@
             </table>
         {else}
             {foreach $strain in $strains.list}
-                <div class='sg_strain_box sg_s_strain_box' data-kind='strains' data-id="{$strain['id']}">
-                    <div class='sg_strain_title'>{$strain['name']}</div>
-                    {if $strains.visualsVisible}
-                    <div class='sg_strain_visual'><canvas data-kind='strains' data-id='{$strain['id']}'></canvas></div>
-                    {/if}
-                </div>
+                {call .strain}
+                    {param strain:$strain /}
+                    {param visuals: $strains.visualsVisible/}
+                    {param kind: 'strains' /}
+                {/call}
             {/foreach}
         {/if}
     {else}
@@ -130,7 +142,7 @@
         {/if}
 
         {if $experiment.canmate}
-            <button class='sg_new_experiment_mate'>Mate</button>
+            <button class='sg_new_experiment_mate' data-kind='new_experiment'>Mate</button>
         {/if}
     </div>
     {if $experiment.expanded}
@@ -141,7 +153,11 @@
         </div>
         {else}
         <div class='sg_experiment_parent' data-kind='new_experiment' data-id='{$experiment.parents[0].id}'>
-            {$experiment.parents[0].name}
+            {call .strain}
+                    {param strain:$experiment.parents[0] /}
+                    {param visuals: $experiment.visualsVisible/}
+                    {param kind:'new_experiment'/}
+            {/call}
         </div>
         {/if}
         {if $experiment.parents.length <2}
@@ -150,7 +166,11 @@
         </div>
         {else}
         <div class='sg_experiment_parent' data-kind='new_experiment' data-id='{$experiment.parents[1].id}'>
-            {$experiment.parents[1].name}
+            {call .strain}
+                    {param strain:$experiment.parents[1] /}
+                    {param visuals: $experiment.visualsVisible/}
+                    {param kind:'new_experiment'/}
+            {/call}
         </div>
         {/if}
     </div>
@@ -165,6 +185,7 @@
 {template .all_experiments}
 {foreach $experiment in $experiments.list}
 <div class='sg_experiment_box'>
+    <!-- header -->
     <div class='sg_title_box'>
         {$experiment.name}
                 {if $experiment.expanded}
@@ -191,36 +212,91 @@
             <button class='sg_experiment_mate'>Add progenies</button>
         {/if}
     </div>
-        {if $experiment.expanded}
-        <div class='sg_experiment_parents'>
-            {if $experiment.parents.length <1}
-            <div class='sg_experiment_parent' data-kind='new_experiment'>
-                Drop strain here
-            </div>
-            {else}
-            <div class='sg_experiment_parent' data-kind='new_experiment' data-id='{$experiment.parents[0].id}'>
-                {$experiment.parents[0].name}
-            </div>
-            {/if}
-            {if $experiment.parents.length <2}
-            <div class='sg_experiment_parent' data-kind='new_experiment'>
-                Drop strain here
-            </div>
-            {else}
-            <div class='sg_experiment_parent' data-kind='new_experiment' data-id='{$experiment.parents[1].id}'>
-                {$experiment.parents[1].name}
-            </div>
-            {/if}
-        </div>
-        <div class='sg_experiment_progeny_list'>
-        {foreach $o in $experiment.list}
-            <div class='sg_experiment_progeny' data-strain='{$o.id}' data-kind='{$experiment.id}'>
-                {$o.name}
-            </div>
-        {/foreach}
-        </div>
-
+    {if $experiment.expanded}
+    <!-- expanded body -->
+        {if $experiment.propertiesVisible}
+        /**
+          * Properties are visible (long summary)
+        */
+        <table>
+                <tr>
+                <th>Name</th>
+                <th>{$experiment.parent.female.name}</th>
+                <th>{$experiment.parent.male.name}</th>
+                {foreach $phenotype in keys($experiment.phenotypes)}
+                <th>{$phenotype}</th>
+                {/foreach}
+                </tr>
+                {if $experiment.visualsVisible}
+                <tr><td>Visual</td>
+                <td>
+                    {call .strain}
+                    {param strain:$experiment.parent.female /}
+                    {param visuals: $experiment.visualsVisible/}
+                    {param kind:$experiment.id/}
+                    {/call}
+                </td>
+                <td>
+                    {call .strain}
+                    {param strain:$experiment.parent.male /}
+                    {param visuals: $experiment.visualsVisible/}
+                    {param kind:$experiment.id/}
+                    {/call}
+                </td>
+                {foreach $phenotype in keys($experiment.phenotypes)}
+                    <td>
+                    {call .strain}
+                        {param strain:$experiment.phenotypes[$phenotype].top_male /}
+                        {param visuals: $experiment.visualsVisible/}
+                        {param kind:$experiment.id/}
+                    {/call}
+                    {call .strain}
+                        {param strain:$experiment.phenotypes[$phenotype].top_female /}
+                        {param visuals: $experiment.visualsVisible/}
+                        {param kind:$experiment.id/}
+                    {/call}
+                    </td>
+                {/foreach}
+                </tr>
+                {/if}
+                <tr><td>Sex (M/F)</td>
+                <td>0/1</td><td>1/0</td>
+                {foreach $phenotype in keys($experiment.phenotypes)}
+                <td>    {$experiment.phenotypes[$phenotype].males}/{$experiment.phenotypes[$phenotype].females}
+                </td>
+                {/foreach}
+                {foreach $property in $experiment.propertiesList}
+                    <tr><td>{$property}</td>
+                    <td>{$experiment.parent.female.properties[$property].text}</td>
+                    <td>{$experiment.parent.male.properties[$property].text}</td>
+                    {foreach $phenotype in keys($experiment.phenotypes)}
+                    <td>{$experiment.phenotypes[$phenotype].properties[$property].text}
+                    </td>
+                    {/foreach}
+                    </tr>
+                {/foreach}
+        </table>
+        {else}
+            /** No properties with or without visuals */
+            <table>
+                <tr><th>Sex</th><th>Parents</th><th>Offsprings</th></tr>
+                <tr><td>Female</td><td>
+                {call .strain}
+                    {param strain:$experiment.parent.female /}
+                    {param visuals: $experiment.visualsVisible/}
+                    {param kind:$experiment.id/}
+                {/call}
+                </td><td>{$experiment.stats.sex.females}</td></tr>
+                <tr><td>Male</td><td>
+                {call .strain}
+                    {param strain:$experiment.parent.male /}
+                    {param visuals: $experiment.visualsVisible /}
+                    {param kind:$experiment.id/}
+                {/call}
+                </td><td>{$experiment.stats.sex.males}</td></tr>
+            </table>
         {/if}
+    {/if}
 </div>
 {/foreach}
 

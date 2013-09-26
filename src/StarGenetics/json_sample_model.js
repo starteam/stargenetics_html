@@ -39,25 +39,45 @@ define(["require", "exports"], function(require, exports) {
             "experiments": {},
             "phenotype_rules": [
                 {
-                    "name": "default",
-                    "matches": "*",
-                    "phenotype": {
-                        "wings": 1,
-                        "eyes": "red"
+                    name: 'default',
+                    matches: '*',
+                    phenotype: {
+                        bodycolor: {
+                            text: 'yellow',
+                            value: 'yellow'
+                        },
+                        mouth: {
+                            text: 'Happy',
+                            value: 'happy'
+                        },
+                        eyes: {
+                            text: 'Circle Eyes',
+                            value: 'circle'
+                        }
                     }
                 },
                 {
-                    "name": "white eyes",
-                    "matches": "a,a",
-                    "phenotype": {
-                        "eyes": "white"
+                    name: 'white eyes',
+                    matches: 'a,a',
+                    phenotype: {
+                        bodycolor: {
+                            text: 'white',
+                            value: 'white'
+                        }
                     }
                 },
                 {
-                    "name": "wingless",
-                    "matches": "b,b",
-                    "phenotype": {
-                        "wings": 0
+                    name: 'wingless',
+                    matches: 'b,b',
+                    phenotype: {
+                        mouth: {
+                            text: 'Sad',
+                            value: 'sad'
+                        },
+                        eyes: {
+                            text: 'Cross Eyes',
+                            value: 'cross'
+                        }
                     }
                 }
             ],
