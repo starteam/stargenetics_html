@@ -1,9 +1,13 @@
-define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(require, exports) {
+define(["require", "exports", "StarGenetics/state", "StarGenetics/stargeneticsws.soy"], function(require, exports) {
     var SGUI = require("StarGenetics/stargeneticsws.soy");
+    var GlobalState = require("StarGenetics/state");
+    var StarGeneticsGlobalState = new GlobalState.StarGeneticsGlobalState();
 
     var StarGeneticsJavaAppWidget = (function () {
         function StarGeneticsJavaAppWidget(state, config) {
             this.state = state;
+            state.StarGeneticsAppWidgetState = new GlobalState.StarGeneticsAppWidgetState(config);
+            this.config = config;
             this.widget_state = state.StarGeneticsAppWidgetState;
 
             this.set_message(SGUI.before_open());
@@ -140,6 +144,9 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy"], function(requi
                 self.onmessage(socket, messageevent);
                 self.state.onmessage(messageevent);
             };
+        };
+
+        StarGeneticsJavaAppWidget.prototype.run = function () {
         };
         return StarGeneticsJavaAppWidget;
     })();

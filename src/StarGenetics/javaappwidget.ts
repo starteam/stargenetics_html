@@ -2,15 +2,18 @@
 /// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
 /// <reference path="state.ts" />
 /// <reference path="config.d.ts" />
+/// <amd-dependency path="StarGenetics/state" />
 /// <amd-dependency path="StarGenetics/stargeneticsws.soy" />
 
 var SGUI = require("StarGenetics/stargeneticsws.soy");
+var GlobalState = require("StarGenetics/state");
+var StarGeneticsGlobalState = new GlobalState.StarGeneticsGlobalState()
 
 
 export class StarGeneticsJavaAppWidget {
-    state:StarGeneticsState;
-    widget_state:StarGeneticsAppWidgetState;
-
+    state:any;
+    widget_state:any;
+    config:any;
     element() {
         return $('#' + this.state.StarGeneticsAppWidgetState.uid);
     }
@@ -27,8 +30,10 @@ export class StarGeneticsJavaAppWidget {
         return this.state.StarGeneticsAppWidgetState.input_element.attr('value');
     }
 
-    constructor(state:StarGeneticsState, config:StarGeneticsConfig) {
+    constructor(state:any, config:StarGeneticsConfig) {
         this.state = state;
+        state.StarGeneticsAppWidgetState = new GlobalState.StarGeneticsAppWidgetState(config);
+        this.config = config;
         this.widget_state = state.StarGeneticsAppWidgetState;
 //        this.$element = $('#' + this.state.StarGeneticsAppWidgetState.uid);
         this.set_message(SGUI.before_open());
@@ -155,6 +160,11 @@ export class StarGeneticsJavaAppWidget {
             self.onmessage(socket, messageevent);
             self.state.onmessage(messageevent);
         }
+
+    }
+
+    run()
+    {
 
     }
 }

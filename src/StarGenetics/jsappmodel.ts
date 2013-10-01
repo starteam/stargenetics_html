@@ -96,6 +96,7 @@ export class Base {
  */
 export class Strain extends Base {
     name:string;
+    sex:string;
 
     get properties() {
         var ret = {};
@@ -230,7 +231,13 @@ export class Experiment extends Collapsable {
         if (this.parents.length < 2) {
             if (this.parents.length == 1) {
                 //TODO: Depending on the model, it is possible that sex needs to be different...
+                if( this.parents[0].sex == s.sex )
+                {
+                    alert( "There is already " + s.sex.toLowerCase() + " parent.");
+                    return;
+                }
             }
+            console.info( "Added here!" ) ;
             this.__data__.parents.push(s.__data__);
         }
     }

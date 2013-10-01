@@ -220,7 +220,12 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
         Experiment.prototype.addParent = function (s) {
             if (this.parents.length < 2) {
                 if (this.parents.length == 1) {
+                    if (this.parents[0].sex == s.sex) {
+                        alert("There is already " + s.sex.toLowerCase() + " parent.");
+                        return;
+                    }
                 }
+                console.info("Added here!");
                 this.__data__.parents.push(s.__data__);
             }
         };
