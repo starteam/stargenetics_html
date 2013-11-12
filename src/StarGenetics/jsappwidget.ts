@@ -16,7 +16,9 @@ var SGUIMAIN:any = require("StarGenetics/sg_client_mainframe.soy");
 import json_sample_model = require("StarGenetics/json_sample_model");
 import SGModel = require("StarGenetics/jsappmodel");
 import SGState = require("state");
+import VisualizerBase = require("StarGenetics/visualizers/base");
 import SGSmiley = require("StarGenetics/visualizers/smiley");
+import SGFly = require("StarGenetics/visualizers/fly");
 import SGTests = require( "StarGenetics/tests/qunit");
 
 declare var jQuery;
@@ -303,7 +305,15 @@ export class StarGeneticsJSAppWidget {
                 self.show();
             }});
 
-        var visualizer:SGSmiley.Smiley = new SGSmiley.Smiley();
+        console.error( "Visualizer config" ) ;
+        var visualizer_name:string = (((((this.config['config']||{})['model'] || {})['genetics'] || {})['visualizer'] || {})['name'] || "Not defined");
+        var visualizer:VisualizerBase.Visualizer = new SGSmiley.Smiley();
+        console.error( this.config ) ;
+        console.error( visualizer_name );
+        if( visualizer_name == 'fly')
+        {
+            visualizer = new SGFly.Fly();
+        }
         $('.sg_strain_visual canvas').each(function () {
             var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
             var organism = c.get($(this).data('id'));

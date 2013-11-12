@@ -1,4 +1,9 @@
-export class Smiley {
+/// <reference path="../../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="base.ts" />
+
+import base = require("StarGenetics/visualizers/base");
+
+export class Smiley implements base.Visualizer {
     smileyWidth = 75;
     smileyHeight = 75;
 

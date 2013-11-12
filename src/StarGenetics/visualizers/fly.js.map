@@ -1,0 +1,1 @@
+{"version":3,"file":"fly.js","sources":["fly.ts"],"names":["Fly","Fly.constructor","Fly.render"],"mappings":";;;;;;AAAA;IACA,WAAsB,QAA+B,CAAE;;IAEvD;;QAAAA;;;AAMCA,QAJGA,uBAAAA,UAAOA,MAAwBA,EAAEA,UAAcA;YAE3CE,OAAOA,CAACA,IAAIA,CAAEA,YAAYA,CAAAA,CAAEA;QAChCA,CAACA;QACLF;AAACA,IAADA,CAACA,EANwB,IAAI,CAAC,cAAc,EAM3C;IAND,kBAMC;GAAA"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"base.js","sources":["base.ts"],"names":["BaseVisualizer","BaseVisualizer.constructor","BaseVisualizer.render"],"mappings":"AAAA;IAIA;QAAAA;YACIC,KAAAA,KAAKA,GAAUA,EAAEA,CAACA;YAClBA,KAAAA,MAAMA,GAAUA,EAAEA,CAACA;;AAKtBD,QAHGA,kCAAAA,UAAOA,MAAwBA,EAAEA,UAAcA;QAE/CE,CAACA;QACLF;AAACA,IAADA,CAACA,IAAA;IAPD,wCAOC;GACD"}

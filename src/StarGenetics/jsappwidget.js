@@ -1,9 +1,11 @@
-define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "StarGenetics/tests/qunit", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__, __SGSmiley__, __SGTests__) {
+define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "StarGenetics/visualizers/fly", "StarGenetics/tests/qunit", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__, __SGSmiley__, __SGFly__, __SGTests__) {
     var SGUIMAIN = require("StarGenetics/sg_client_mainframe.soy");
     var json_sample_model = __json_sample_model__;
     var SGModel = __SGModel__;
     
+    
     var SGSmiley = __SGSmiley__;
+    var SGFly = __SGFly__;
     var SGTests = __SGTests__;
 
     var $ = jQuery;
@@ -236,7 +238,14 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                 }
             });
 
+            console.error("Visualizer config");
+            var visualizer_name = (((((this.config['config'] || {})['model'] || {})['genetics'] || {})['visualizer'] || {})['name'] || "Not defined");
             var visualizer = new SGSmiley.Smiley();
+            console.error(this.config);
+            console.error(visualizer_name);
+            if (visualizer_name == 'fly') {
+                visualizer = new SGFly.Fly();
+            }
             $('.sg_strain_visual canvas').each(function () {
                 var c = self.model.ui.get($(this).data('kind'));
                 var organism = c.get($(this).data('id'));

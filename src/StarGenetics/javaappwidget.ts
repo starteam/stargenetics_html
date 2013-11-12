@@ -7,7 +7,8 @@
 
 var SGUI = require("StarGenetics/stargeneticsws.soy");
 var GlobalState = require("StarGenetics/state");
-var StarGeneticsGlobalState = new GlobalState.StarGeneticsGlobalState()
+var StarGeneticsGlobalState = new GlobalState.StarGeneticsGlobalState();
+
 
 
 export class StarGeneticsJavaAppWidget {

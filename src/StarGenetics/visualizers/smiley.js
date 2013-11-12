@@ -1,4 +1,6 @@
 define(["require", "exports"], function(require, exports) {
+    
+
     var Smiley = (function () {
         function Smiley() {
             this.smileyWidth = 75;
