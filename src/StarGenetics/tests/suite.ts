@@ -23,6 +23,7 @@ export function testSuite(qunit, jsappwidget:App.StarGeneticsJSAppWidget) {
     expandnewexperiment();
     collapsenewexperiment();
     expandnewexperiment();
+    expand_visuals_strains();
     set_experiment();
 }
 
@@ -64,12 +65,28 @@ function expand(kind, expanded) {
     });
 }
 
+function expand_visuals(kind, expanded) {
+    q.test("expand_visuals " + kind, function () {
+        var expand = $('.sg_strain_expand_visuals[data-kind="' + kind + '"][data-expanded-visuals="' + expanded + '"]');
+        q.equal(expand.size(), 1, "need at one sg_strain_expand_visuals");
+        expand.click();
+    });
+}
+
 function expandstrains() {
     expand('strains', 'true');
 }
 
 function collapsestrains() {
     expand('strains', 'false');
+}
+
+function expand_visuals_strains() {
+    expand_visuals('strains', 'true');
+}
+
+function collapse_visuals_strains() {
+    expand_visuals('strains', 'false');
 }
 
 function expandnewexperiment() {
