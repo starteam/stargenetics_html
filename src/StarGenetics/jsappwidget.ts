@@ -317,9 +317,19 @@ export class StarGeneticsJSAppWidget {
         $('.sg_strain_visual canvas').each(function () {
             var c:SGModel.Collapsable = self.model.ui.get($(this).data('kind'));
             var organism = c.get($(this).data('id'));
-            visualizer.render($(this)[0], organism.properties);
+            console.error( "RENDER");
+            console.error( organism);
+            visualizer.render($(this)[0], organism.properties, organism);
             window['c'] = this;
             window['v'] = visualizer;
+            var qq = this;
+            window['rr'] = function() {
+                console.info( "Hello World!");
+                console.info( qq ) ;
+                console.info( visualizer);
+                console.info( organism);
+                visualizer.render($(qq)[0], organism.properties, organism);
+            };
         });
     }
 
