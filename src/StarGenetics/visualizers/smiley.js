@@ -1,27 +1,23 @@
-define(["require", "exports"], function(require, exports) {
-    
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+define(["require", "exports", "StarGenetics/visualizers/base"], function(require, exports, __base__) {
+    var base = __base__;
 
-    var Smiley = (function () {
+    var Smiley = (function (_super) {
+        __extends(Smiley, _super);
         function Smiley() {
+            _super.call(this);
             this.smileyWidth = 75;
             this.smileyHeight = 75;
             this.bodyRadius = .8;
+            this.width = this.smileyWidth;
+            this.height = this.smileyHeight;
         }
-        Smiley.prototype.prepare = function (canvas) {
-            canvas.setAttribute('width', '' + this.smileyWidth);
-            canvas.setAttribute('height', '' + this.smileyHeight);
-            var context = canvas.getContext("2d");
-            context.save();
-            context.scale(this.smileyWidth / 4, this.smileyHeight / 4);
-            context.translate(1, 1);
-            return context;
-        };
-
-        Smiley.prototype.commit = function (context) {
-            context.restore();
-        };
-
-        Smiley.prototype.render = function (canvas, properties) {
+        Smiley.prototype.render = function (canvas, properties, organism) {
             console.info("Smiley render ");
             console.info(canvas);
             console.info(properties);
@@ -34,10 +30,6 @@ define(["require", "exports"], function(require, exports) {
 
             this.commit(context);
             console.info("Smiley render done");
-        };
-
-        Smiley.prototype.clearImage = function (context) {
-            context.clearRect(-1, -1, 1, 1);
         };
 
         Smiley.prototype.drawBody = function (context, properties) {
@@ -107,7 +99,7 @@ define(["require", "exports"], function(require, exports) {
             context.closePath();
         };
         return Smiley;
-    })();
+    })(base.BaseVisualizer);
     exports.Smiley = Smiley;
 });
 //@ sourceMappingURL=smiley.js.map

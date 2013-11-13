@@ -3,30 +3,21 @@
 
 import base = require("StarGenetics/visualizers/base");
 
-export class Smiley implements base.Visualizer {
+export class Smiley extends base.BaseVisualizer implements base.Visualizer {
     smileyWidth = 75;
     smileyHeight = 75;
 
     bodyRadius:number = .8;
 
-    prepare(canvas:HTMLCanvasElement):CanvasRenderingContext2D {
-
-        canvas.setAttribute('width', '' + this.smileyWidth);
-        canvas.setAttribute('height', '' + this.smileyHeight);
-        var context = canvas.getContext("2d");
-        context.save();
-        context.scale(this.smileyWidth / 4, this.smileyHeight / 4);
-        context.translate(1, 1);
-        return context;
+    constructor()
+    {
+        super();
+        this.width = this.smileyWidth;
+        this.height = this.smileyHeight;
     }
 
-    commit(context) {
-        //context.commit();
-        context.restore();
 
-    }
-
-    render(canvas:HTMLCanvasElement, properties:any) {
+    render(canvas:HTMLCanvasElement, properties:any,organism:any) {
         console.info("Smiley render ");
         console.info(canvas);
         console.info(properties);
@@ -41,10 +32,6 @@ export class Smiley implements base.Visualizer {
         this.commit(context);
         console.info("Smiley render done");
 
-    }
-
-    clearImage(context:CanvasRenderingContext2D) {
-        context.clearRect(-1, -1, 1, 1);
     }
 
     drawBody(context:CanvasRenderingContext2D, properties:any) {
