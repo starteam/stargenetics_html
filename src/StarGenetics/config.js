@@ -1,3 +1,4 @@
+/// <reference path="config.d.ts" />
 define(["require", "exports"], function(require, exports) {
     var ConfigElement = (function () {
         function ConfigElement(name) {
@@ -11,4 +12,4 @@ define(["require", "exports"], function(require, exports) {
         new ConfigElement('hide')
     ];
 });
-//@ sourceMappingURL=config.js.map
+//# sourceMappingURL=config.js.map

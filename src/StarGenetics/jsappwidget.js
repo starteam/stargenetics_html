@@ -1,12 +1,16 @@
-define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "StarGenetics/visualizers/fly", "StarGenetics/tests/qunit", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, __json_sample_model__, __SGModel__, __SGSmiley__, __SGFly__, __SGTests__) {
+/// <reference path="state.ts" />
+/// <reference path="config.d.ts" />
+/// <reference path="jsappmodel.ts" />
+/// <reference path="visualizers/smiley.ts" />
+/// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
+/// <reference path="../../../starx/src/StarX/lib/jquery-ui-1.8.x.d.ts" />
+define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/jsappmodel", "StarGenetics/visualizers/smiley", "StarGenetics/visualizers/fly", "StarGenetics/tests/qunit", "jquery", "jquery-ui", "StarGenetics/json_sample_model"], function(require, exports, json_sample_model, SGModel, SGSmiley, SGFly, SGTests) {
+    /// <amd-reference path="StarGenetics/sg_client_mainframe.soy" />
+    /// <amd-dependency path="jquery" />
+    /// <amd-dependency path="jquery-ui" />
+    /// <amd-dependency path="StarGenetics/json_sample_model" />
     var SGUIMAIN = require("StarGenetics/sg_client_mainframe.soy");
-    var json_sample_model = __json_sample_model__;
-    var SGModel = __SGModel__;
-    
-    
-    var SGSmiley = __SGSmiley__;
-    var SGFly = __SGFly__;
-    var SGTests = __SGTests__;
 
     var $ = jQuery;
 
@@ -18,6 +22,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             this.initModel();
             this.init();
         }
+        /**
+        * This method loads GWT frame & waits for it to finish loading
+        */
         StarGeneticsJSAppWidget.prototype.init = function () {
             var config = this.config;
             $('#' + config.element_id).html("StarGenetics: ClientApp starting");
@@ -25,6 +32,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             this.wait_for_sg_interface('#' + config.element_id + '_gwt', config, this);
         };
 
+        /**
+        * This method loads GWT frame & waits for it to finish loading
+        */
         StarGeneticsJSAppWidget.prototype.wait_for_sg_interface = function (id, config, self) {
             console.info("wait_for_sg_interface");
             console.info(self.model.ui);
@@ -46,11 +56,17 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             }
         };
 
+        /**
+        * Post init executes when GWT is loaded
+        */
         StarGeneticsJSAppWidget.prototype.postInit = function () {
             this.start_client_app();
             this.testHook();
         };
 
+        /**
+        * Start Client App loads initial UI
+        */
         StarGeneticsJSAppWidget.prototype.start_client_app = function () {
             var self = this;
             var main = $('#' + this.config.element_id);
@@ -61,6 +77,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             });
         };
 
+        /**
+        * Test Hook load QTest & if URL warrants it loads test suite
+        */
         StarGeneticsJSAppWidget.prototype.testHook = function () {
             var self = this;
             if (SGTests.isTesting()) {
@@ -75,6 +94,10 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
         StarGeneticsJSAppWidget.prototype.run = function () {
         };
 
+        /**
+        * This sets up model,
+        * TODO: in the future it will decide on model to load from StarX configuration
+        */
         StarGeneticsJSAppWidget.prototype.initModel = function () {
             var model = new SGModel.Top({
                 backend: json_sample_model.model1,
@@ -97,6 +120,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             console.info(json_sample_model.model1);
         };
 
+        /**
+        * Opens StarGenetics backend with selected model
+        */
         StarGeneticsJSAppWidget.prototype.open = function (callbacks) {
             var self = this;
             this.stargenetics_interface({
@@ -118,6 +144,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             });
         };
 
+        /**
+        * Lists strains & relaods UI
+        */
         StarGeneticsJSAppWidget.prototype.list_strains = function (callbacks) {
             console.info("Running liststrain");
             var self = this;
@@ -139,14 +168,26 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             });
         };
 
+        /**
+        * add parent
+        * @param experiments
+        */
         StarGeneticsJSAppWidget.prototype.add_parent = function (experiment, strain) {
             experiment.addParent(strain);
         };
 
+        /**
+        * Run mating experiment
+        * @param experiments
+        */
         StarGeneticsJSAppWidget.prototype.mate = function (experiment, callbacks) {
             this.update_experiments(experiment, 'mate', callbacks);
         };
 
+        /**
+        * Run update experiment
+        * @param experiments
+        */
         StarGeneticsJSAppWidget.prototype.update_experiments = function (experiment, command, callbacks) {
             console.info("Running update_experiments");
             console.info(experiment.toJSON());
@@ -179,6 +220,9 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
             });
         };
 
+        /**
+        * Redraws UI
+        */
         StarGeneticsJSAppWidget.prototype.show = function () {
             var self = this;
             var main = $('.sg_workspace', '#' + this.config.element_id);
@@ -211,17 +255,14 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                 self.mate(c, {
                     onsuccess: function () {
                         console.info("Mate success!");
-                    },
-                    onerror: function () {
+                    }, onerror: function () {
                         console.info("Mate error!");
-                    }
-                });
+                    } });
                 self.show();
             });
 
             $('.sg_strain_box').draggable({ revert: true });
-            $('.sg_experiment_parent').droppable({
-                drop: function (e, ui) {
+            $('.sg_experiment_parent').droppable({ drop: function (e, ui) {
                     console.info("Hello World");
                     console.info(this);
                     console.info(e);
@@ -235,8 +276,7 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
                     var target_collection = self.model.ui.get(target.data('kind'));
                     self.add_parent(target_collection, src_strain);
                     self.show();
-                }
-            });
+                } });
 
             console.error("Visualizer config");
             var visualizer_name = (((((this.config['config'] || {})['model'] || {})['genetics'] || {})['visualizer'] || {})['name'] || "Not defined");
@@ -268,4 +308,4 @@ define(["require", "exports", "StarGenetics/json_sample_model", "StarGenetics/js
     })();
     exports.StarGeneticsJSAppWidget = StarGeneticsJSAppWidget;
 });
-//@ sourceMappingURL=jsappwidget.js.map
+//# sourceMappingURL=jsappwidget.js.map

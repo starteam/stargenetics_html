@@ -1,3 +1,5 @@
+/// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
+/// <reference path="config.d.ts" />
 define(["require", "exports"], function(require, exports) {
     var StudentIDWidgetState = (function () {
         function StudentIDWidgetState(config) {
@@ -30,7 +32,7 @@ define(["require", "exports"], function(require, exports) {
             get: function () {
                 var ret;
                 var jq = $('[name=' + this.config.State + ']');
-                var ret = $('#' + jq.attr('inputid'));
+                ret = $('#' + jq.attr('inputid'));
                 return ret;
             },
             enumerable: true,
@@ -56,7 +58,7 @@ define(["require", "exports"], function(require, exports) {
             get: function () {
                 var ret;
                 var jq = $('[name=' + this.config.State + ']');
-                var ret = $('#' + jq.attr('inputid'));
+                ret = $('#' + jq.attr('inputid'));
                 return ret;
             },
             enumerable: true,
@@ -159,4 +161,4 @@ define(["require", "exports"], function(require, exports) {
     })();
     exports.StarGeneticsGlobalState = StarGeneticsGlobalState;
 });
-//@ sourceMappingURL=state.js.map
+//# sourceMappingURL=state.js.map

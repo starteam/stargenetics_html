@@ -97,4 +97,4 @@ define(["require", "exports"], function(require, exports) {
         }
     };
 });
-//@ sourceMappingURL=json_sample_model.js.map
+//# sourceMappingURL=json_sample_model.js.map

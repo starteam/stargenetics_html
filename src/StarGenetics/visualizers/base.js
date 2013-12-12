@@ -19,10 +19,11 @@ define(["require", "exports"], function(require, exports) {
         };
 
         BaseVisualizer.prototype.commit = function (context) {
+            //context.commit();
             context.restore();
         };
         return BaseVisualizer;
     })();
     exports.BaseVisualizer = BaseVisualizer;
 });
-//@ sourceMappingURL=base.js.map
+//# sourceMappingURL=base.js.map

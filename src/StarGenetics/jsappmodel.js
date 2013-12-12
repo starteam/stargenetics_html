@@ -1,11 +1,14 @@
+/// <reference path="../StarX/lib/jquery.d.ts" />
+/// <reference path="../StarX/lib/require.d.ts" />
+/// <reference path="../StarX/lib/underscore.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-define(["require", "exports", "lib/underscore"], function(require, exports) {
-    var _ = require("lib/underscore")._;
+define(["require", "exports", "StarX/lib/underscore"], function(require, exports, underscore) {
+    var _ = underscore['_'];
 
     var Base = (function () {
         function Base(jsonmodel) {
@@ -90,6 +93,9 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     })();
     exports.Base = Base;
 
+    /**
+    * Strain class
+    */
     var Strain = (function (_super) {
         __extends(Strain, _super);
         function Strain() {
@@ -129,10 +135,15 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     Base.readOnlyField(Strain, "id", null);
     Base.readOnlyField(Strain, "sex", null);
 
+    /**
+    * Collapsable defines core UI element
+    */
     var Collapsable = (function (_super) {
         __extends(Collapsable, _super);
         function Collapsable() {
             _super.apply(this, arguments);
+            this.expanded = true;
+            this.visualsVisible = true;
         }
         Collapsable.prototype.update_properties = function (list) {
             var properties = {};
@@ -209,6 +220,9 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     })(Base);
     exports.ExperimentStatistics = ExperimentStatistics;
 
+    /**
+    * Experiment class adds parents to the mix
+    */
     var Experiment = (function (_super) {
         __extends(Experiment, _super);
         function Experiment(q) {
@@ -220,6 +234,7 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
         Experiment.prototype.addParent = function (s) {
             if (this.parents.length < 2) {
                 if (this.parents.length == 1) {
+                    //TODO: Depending on the model, it is possible that sex needs to be different...
                     if (this.parents[0].sex == s.sex) {
                         alert("There is already " + s.sex.toLowerCase() + " parent.");
                         return;
@@ -324,6 +339,9 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     Base.readOnlyWrappedList(Experiment, "parents", Strain);
     Base.readOnlyField(Experiment, "id", null);
 
+    /**
+    * Strains box
+    */
     var Strains = (function (_super) {
         __extends(Strains, _super);
         function Strains() {
@@ -364,6 +382,9 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     exports.Experiments = Experiments;
     Base.readOnlyWrappedList(Experiments, "list", Experiment);
 
+    /**
+    * UIModel
+    */
     var UIModel = (function (_super) {
         __extends(UIModel, _super);
         function UIModel() {
@@ -398,6 +419,11 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     Base.readOnlyWrappedField(UIModel, "new_experiment", NewExperiment);
     Base.readOnlyWrappedField(UIModel, "experiments", Experiments);
 
+    /**
+    * Top wraps JSON its structure is:
+    *      model -- this is passed to GWT
+    *      ui -- this is wrapped by UIModel
+    */
     var Top = (function (_super) {
         __extends(Top, _super);
         function Top() {
@@ -409,4 +435,4 @@ define(["require", "exports", "lib/underscore"], function(require, exports) {
     Base.defineStaticRWField(Top, "backend", {});
     Base.readOnlyWrappedField(Top, "ui", UIModel);
 });
-//@ sourceMappingURL=jsappmodel.js.map
+//# sourceMappingURL=jsappmodel.js.map

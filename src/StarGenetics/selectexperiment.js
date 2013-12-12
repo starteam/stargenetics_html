@@ -1,3 +1,8 @@
+/// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
+/// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="state.ts" />
+/// <reference path="config.d.ts" />
+/// <amd-dependency path="StarGenetics/selectexperiment.soy" />
 define(["require", "exports", "StarGenetics/selectexperiment.soy"], function(require, exports) {
     var SGUI = require("StarGenetics/selectexperiment.soy");
 
@@ -70,4 +75,4 @@ define(["require", "exports", "StarGenetics/selectexperiment.soy"], function(req
     })();
     exports.StarGeneticsSelectExperimentWidget = StarGeneticsSelectExperimentWidget;
 });
-//@ sourceMappingURL=selectexperiment.js.map
+//# sourceMappingURL=selectexperiment.js.map

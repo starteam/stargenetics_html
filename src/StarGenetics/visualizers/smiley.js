@@ -1,12 +1,12 @@
+/// <reference path="../../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="base.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-define(["require", "exports", "StarGenetics/visualizers/base"], function(require, exports, __base__) {
-    var base = __base__;
-
+define(["require", "exports", "StarGenetics/visualizers/base"], function(require, exports, base) {
     var Smiley = (function (_super) {
         __extends(Smiley, _super);
         function Smiley() {
@@ -28,6 +28,8 @@ define(["require", "exports", "StarGenetics/visualizers/base"], function(require
             this.drawEyes(context, properties);
             this.drawMouth(context, properties);
 
+            //        this.drawSterile(context,properties);
+            //        this.drawMatings(context,properties);
             this.commit(context);
             console.info("Smiley render done");
         };
@@ -102,4 +104,4 @@ define(["require", "exports", "StarGenetics/visualizers/base"], function(require
     })(base.BaseVisualizer);
     exports.Smiley = Smiley;
 });
-//@ sourceMappingURL=smiley.js.map
+//# sourceMappingURL=smiley.js.map

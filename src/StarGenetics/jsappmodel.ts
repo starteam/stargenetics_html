@@ -1,8 +1,10 @@
-/// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
-/// <reference path="../../../starx/src/StarX/lib/underscore.d.ts" />
-/// <amd-dependency path="lib/underscore" />
+/// <reference path="../StarX/lib/jquery.d.ts" />
+/// <reference path="../StarX/lib/require.d.ts" />
+/// <reference path="../StarX/lib/underscore.d.ts" />
 
-var _ = require("lib/underscore")._;
+
+import underscore = require("StarX/lib/underscore");
+var _ = underscore['_'];
 
 export class Base {
     __data__:any;
@@ -132,8 +134,8 @@ Base.readOnlyField(Strain, "sex", null);
  * Collapsable defines core UI element
  */
 export class Collapsable extends Base {
-    expanded:bool;
-    visualsVisible:bool;
+    expanded:bool = true;
+    visualsVisible:bool = true;
     propertiesVisible:bool;
     name:string;
     list:Strain[];

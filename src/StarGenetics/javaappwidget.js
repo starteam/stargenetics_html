@@ -1,3 +1,9 @@
+/// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
+/// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="state.ts" />
+/// <reference path="config.d.ts" />
+/// <amd-dependency path="StarGenetics/state" />
+/// <amd-dependency path="StarGenetics/stargeneticsws.soy" />
 define(["require", "exports", "StarGenetics/state", "StarGenetics/stargeneticsws.soy"], function(require, exports) {
     var SGUI = require("StarGenetics/stargeneticsws.soy");
     var GlobalState = require("StarGenetics/state");
@@ -10,6 +16,7 @@ define(["require", "exports", "StarGenetics/state", "StarGenetics/stargeneticsws
             this.config = config;
             this.widget_state = state.StarGeneticsAppWidgetState;
 
+            //        this.$element = $('#' + this.state.StarGeneticsAppWidgetState.uid);
             this.set_message(SGUI.before_open());
             this.init();
         }
@@ -120,6 +127,7 @@ define(["require", "exports", "StarGenetics/state", "StarGenetics/stargeneticsws
                 type: 'post',
                 data: { data: JSON.stringify(open) }
             });
+            //socket.send(JSON.stringify(open));
         };
 
         StarGeneticsJavaAppWidget.prototype.establish_connection = function () {
@@ -152,4 +160,4 @@ define(["require", "exports", "StarGenetics/state", "StarGenetics/stargeneticsws
     })();
     exports.StarGeneticsJavaAppWidget = StarGeneticsJavaAppWidget;
 });
-//@ sourceMappingURL=javaappwidget.js.map
+//# sourceMappingURL=javaappwidget.js.map

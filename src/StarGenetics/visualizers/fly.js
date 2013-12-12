@@ -4,9 +4,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-define(["require", "exports", "StarGenetics/visualizers/base"], function(require, exports, __base__) {
-    var base = __base__;
-
+define(["require", "exports", "StarGenetics/visualizers/base"], function(require, exports, base) {
     var Fly = (function (_super) {
         __extends(Fly, _super);
         function Fly() {
@@ -209,6 +207,7 @@ define(["require", "exports", "StarGenetics/visualizers/base"], function(require
         };
 
         Fly.prototype.drawWings = function (context, properties, sex) {
+            // need to implement wing sizing
             context.save();
             context.translate(-.22, .58);
             context.scale(.3, 1.3);
@@ -232,4 +231,4 @@ define(["require", "exports", "StarGenetics/visualizers/base"], function(require
     })(base.BaseVisualizer);
     exports.Fly = Fly;
 });
-//@ sourceMappingURL=fly.js.map
+//# sourceMappingURL=fly.js.map

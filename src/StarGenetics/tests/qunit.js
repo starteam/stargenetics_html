@@ -1,4 +1,7 @@
+/// <reference path="../../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="../../../../starx/src/StarX/lib/jquery.d.ts" />
 define(["require", "exports"], function(require, exports) {
+    
     var $ = jQuery;
 
     function load(callback) {
@@ -26,4 +29,4 @@ define(["require", "exports"], function(require, exports) {
     }
     exports.onerror = onerror;
 });
-//@ sourceMappingURL=qunit.js.map
+//# sourceMappingURL=qunit.js.map

@@ -18,4 +18,4 @@ define(["require", "exports"], function(require, exports) {
     })();
     exports.Workspace = Workspace;
 });
-//@ sourceMappingURL=clientmodel.js.map
+//# sourceMappingURL=clientmodel.js.map

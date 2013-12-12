@@ -33,7 +33,7 @@ export class StarGeneticsSelectExperimentWidgetState {
     {
         var ret;
         var jq = $('[name='+this.config.State+']');
-        var ret = $('#'+jq.attr('inputid'));
+        ret = $('#'+jq.attr('inputid'));
         return ret;
     }
 
@@ -55,7 +55,7 @@ export class StarGeneticsAppWidgetState {
     {
         var ret;
         var jq = $('[name='+this.config.State+']');
-        var ret = $('#'+jq.attr('inputid'));
+        ret = $('#'+jq.attr('inputid'));
         return ret;
     }
 

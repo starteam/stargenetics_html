@@ -1,7 +1,8 @@
+/// <reference path="../../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="../jsappwidget.ts" />
+/// <reference path="../jsappmodel.ts" />
+/// <reference path="../../../../starx/src/StarX/lib/jquery.d.ts" />
 define(["require", "exports"], function(require, exports) {
-    
-    
-
     var $ = jQuery;
 
     var q;
@@ -114,4 +115,4 @@ define(["require", "exports"], function(require, exports) {
         });
     }
 });
-//@ sourceMappingURL=suite.js.map
+//# sourceMappingURL=suite.js.map

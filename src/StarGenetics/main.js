@@ -1,3 +1,19 @@
+/// <reference path="jsappmodel.ts" />
+/// <reference path="../../../starx/src/StarX/lib/require.d.ts" />
+/// <reference path="../../../starx/src/StarX/lib/jquery.d.ts" />
+/// <reference path="../../../starx/src/StarX/lib/jquery-ui-1.8.x.d.ts" />
+/// <reference path="state.ts" />
+/// <reference path="config.d.ts" />
+/// <amd-dependency path="StarGenetics/stargeneticsws.soy" />
+/// <amd-dependency path="StarGenetics/sg_client_mainframe.soy" />
+/// <amd-dependency path="css!StarGenetics/sg_client_mainframe.css" />
+/// <amd-dependency path="StarGenetics/state" />
+/// <amd-dependency path="StarGenetics/javaappwidget" />
+/// <amd-dependency path="StarGenetics/jsappwidget" />
+/// <amd-dependency path="StarGenetics/jsappmodel" />
+/// <amd-dependency path="StarGenetics/selectexperiment" />
+/// <amd-dependency path="jquery" />
+/// <amd-dependency path="jquery-ui" />
 define(["require", "exports", "StarGenetics/stargeneticsws.soy", "StarGenetics/sg_client_mainframe.soy", "css!StarGenetics/sg_client_mainframe.css", "StarGenetics/state", "StarGenetics/javaappwidget", "StarGenetics/jsappwidget", "StarGenetics/jsappmodel", "StarGenetics/selectexperiment", "jquery", "jquery-ui"], function(require, exports) {
     var $ = require("jquery");
 
@@ -9,8 +25,7 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy", "StarGenetics/s
             this.widgets = {
                 'JavaApp': {
                     'require': 'StarGenetics/javaappwidget',
-                    'class': 'StarGeneticsJavaAppWidget'
-                },
+                    'class': 'StarGeneticsJavaAppWidget' },
                 'JSApp': {
                     'require': 'StarGenetics/jsappwidget',
                     'class': 'StarGeneticsJSAppWidget'
@@ -52,4 +67,4 @@ define(["require", "exports", "StarGenetics/stargeneticsws.soy", "StarGenetics/s
         var x = new StarGenetics();
     }
 });
-//@ sourceMappingURL=main.js.map
+//# sourceMappingURL=main.js.map
